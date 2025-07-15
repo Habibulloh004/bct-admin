@@ -74,14 +74,6 @@ export default function LoginForm() {
               {loading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
-          
-          <div className="mt-4 p-3 bg-blue-50 rounded-md">
-            <p className="text-sm text-blue-800">
-              <strong>Default credentials:</strong><br />
-              Username: admin<br />
-              Password: 123
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
