@@ -290,7 +290,6 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
 
       case "select":
         const options = getSelectOptions(field);
-        console.log(options)
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
