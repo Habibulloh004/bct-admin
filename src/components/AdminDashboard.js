@@ -243,7 +243,7 @@ export default function AdminDashboard() {
               </div>
 
               {/* Refresh Button */}
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 onClick={handleRefresh}
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                   className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
                 />
                 <span className="hidden sm:inline">{t("refresh")}</span>
-              </Button>
+              </Button> */}
             </div>
 
             {/* Right side - Actions and User Menu */}
