@@ -138,6 +138,10 @@ const translations = {
     empty: "Empty",
     error: "Error",
     clickToCreate: "Click to create",
+    completed: "completed",
+    formLanguage: "Form Language",
+    currentlyEditing: "Currently editing in",
+    select: "Select",
   },
 
   ru: {
@@ -275,6 +279,10 @@ const translations = {
     empty: "Пусто",
     error: "Ошибка",
     clickToCreate: "Нажмите для создания",
+    completed: "завершено",
+    formLanguage: "Язык формы",
+    currentlyEditing: "Редактирование на",
+    select: "Выберите",
   },
 
   uz: {
@@ -412,6 +420,10 @@ const translations = {
     empty: "Bo'sh",
     error: "Xato",
     clickToCreate: "Yaratish uchun bosing",
+    completed: "bajarildi",
+    formLanguage: "Forma tili",
+    currentlyEditing: "Hozir tahrirlash",
+    select: "Tanlang",
   },
 };
 

@@ -422,7 +422,7 @@ export default function AdminDashboard() {
                           onOpenChange={setIsSingletonEditOpen}
                         >
                           <DialogTrigger asChild>
-                            <Button className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700">
+                            <Button className="flex items-center space-x-2 bg-blue-600 hover:bg-[#2A2C38]">
                               <Edit className="h-4 w-4" />
                               <span>
                                 {t("edit")} {getModelName(currentModel)}
@@ -575,7 +575,7 @@ function SingletonDisplay({
           </p>
           <Button
             onClick={onEdit}
-            className="flex items-center space-x-2 mx-auto bg-blue-600 hover:bg-blue-700"
+            className="flex items-center space-x-2 mx-auto bg-blue-600 hover:bg-[#2A2C38]"
           >
             <Plus className="h-4 w-4" />
             <span>
@@ -715,7 +715,7 @@ function SingletonDisplay({
                 <dt className="font-semibold text-blue-800 text-sm uppercase tracking-wide">
                   {t("lastUpdated")}
                 </dt>
-                <dd className="text-blue-700 font-mono text-sm mt-1">
+                <dd className="text-[#2A2C38] font-mono text-sm mt-1">
                   {new Date(data.updated_at).toLocaleString()}
                 </dd>
               </div>

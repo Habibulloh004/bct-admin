@@ -43,7 +43,7 @@ export const MODELS = {
         required: true,
       },
       { key: "guarantee", label: "Guarantee", type: "multilingual" },
-      { key: "serial_number", label: "Serial Number", type: "text" },
+      // { key: "serial_number", label: "Serial Number", type: "text" },
       {
         key: "category_id",
         label: "Category",
