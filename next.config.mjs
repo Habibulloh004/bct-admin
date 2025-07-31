@@ -9,6 +9,12 @@ const nextConfig = {
         port: "3000",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "q-bit.uz",
+        // port: "3000",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

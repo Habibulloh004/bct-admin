@@ -75,6 +75,8 @@ export default function DataTable({ model, data, onEdit, loading }) {
               key={idx}
               src={`${IMG_URL}${img}`}
               alt="Preview"
+              width={32}
+              height={32}
               className="w-8 h-8 object-cover rounded"
             />
           ))}
@@ -90,17 +92,41 @@ export default function DataTable({ model, data, onEdit, loading }) {
         <Image
           src={`${IMG_URL}${value}`}
           alt="Preview"
+          width={32}
+          height={32}
           className="w-8 h-8 object-cover rounded"
         />
       )
     }
     
+    // Handle foreign key relationships
+    if (field.endsWith('_id') && typeof value === 'string') {
+      return (
+        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+          {value.substring(0, 8)}...
+        </span>
+      )
+    }
+    
     // Truncate long text
     if (typeof value === 'string' && value.length > 50) {
-      return value.substring(0, 50) + '...'
+      return (
+        <span title={value}>
+          {value.substring(0, 50)}...
+        </span>
+      )
     }
     
     return value
+  }
+
+  const getFieldDisplayName = (field) => {
+    // Convert snake_case to Title Case
+    return field
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
   }
 
   const handleDelete = async (id) => {
@@ -127,8 +153,8 @@ export default function DataTable({ model, data, onEdit, loading }) {
 
   return (
     <div className="space-y-4">
-      {/* Search */}
-      <div className="flex items-center space-x-2">
+      {/* Search and Stats */}
+      <div className="flex items-center justify-between">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
@@ -139,7 +165,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
           />
         </div>
         <div className="text-sm text-gray-500">
-          {total} total items
+          {filteredItems.length} of {total} items
         </div>
       </div>
 
@@ -149,8 +175,8 @@ export default function DataTable({ model, data, onEdit, loading }) {
           <TableHeader>
             <TableRow>
               {modelConfig.displayFields.map((field) => (
-                <TableHead key={field} className="capitalize">
-                  {field.replace(/_/g, ' ')}
+                <TableHead key={field} className="font-semibold">
+                  {getFieldDisplayName(field)}
                 </TableHead>
               ))}
               <TableHead className="text-right">Actions</TableHead>
@@ -163,14 +189,14 @@ export default function DataTable({ model, data, onEdit, loading }) {
                   colSpan={modelConfig.displayFields.length + 1} 
                   className="text-center py-8 text-gray-500"
                 >
-                  No {modelConfig.name.toLowerCase()} found
+                  {searchTerm ? 'No matching records found' : `No ${modelConfig.name.toLowerCase()} found`}
                 </TableCell>
               </TableRow>
             ) : (
               filteredItems.map((item) => (
-                <TableRow key={item.id || item._id}>
+                <TableRow key={item.id || item._id} className="hover:bg-gray-50">
                   {modelConfig.displayFields.map((field) => (
-                    <TableCell key={field}>
+                    <TableCell key={field} className="max-w-[200px]">
                       {formatFieldValue(item, field)}
                     </TableCell>
                   ))}
@@ -180,13 +206,20 @@ export default function DataTable({ model, data, onEdit, loading }) {
                         variant="outline"
                         size="sm"
                         onClick={() => onEdit(item)}
+                        className="h-8 w-8 p-0"
+                        title="Edit"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
                       
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm">
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            title="Delete"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
@@ -195,7 +228,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
                               This action cannot be undone. This will permanently delete this{' '}
-                              {modelConfig.name.toLowerCase().slice(0, -1)}.
+                              {modelConfig.name.toLowerCase().slice(0, -1)} and remove it from our servers.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

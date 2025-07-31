@@ -7,61 +7,33 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
 import { Upload, X, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 
-export default function CreateEditForm({ model, item = null, onSuccess, onCancel }) {
+export default function SingletonForm({ model, data = null, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({})
   const [uploadedFiles, setUploadedFiles] = useState({})
   const [errors, setErrors] = useState({})
   
   const { 
-    createItem, 
-    updateItem, 
+    createSingletonItem, 
+    updateSingletonItem, 
     uploadFile, 
-    fetchData, 
-    data, 
     loading, 
     error 
   } = useStore()
   
   const modelConfig = MODELS[model]
-  const isEditing = !!item
+  const hasData = !!data
 
   // Initialize form data
   useEffect(() => {
-    if (item) {
-      const initialData = {}
-      modelConfig.fields.forEach(field => {
-        initialData[field.key] = item[field.key] || ''
-      })
-      setFormData(initialData)
-    } else {
-      const initialData = {}
-      modelConfig.fields.forEach(field => {
-        initialData[field.key] = ''
-      })
-      setFormData(initialData)
-    }
-  }, [item, modelConfig])
-
-  // Fetch options for select fields
-  useEffect(() => {
-    const selectFields = modelConfig.fields.filter(field => field.type === 'select')
-    selectFields.forEach(field => {
-      // Only fetch if not using custom options
-      if (field.options && !modelConfig.customOptions?.[field.options] && !data[field.options]) {
-        fetchData(field.options)
-      }
+    const initialData = {}
+    modelConfig.fields.forEach(field => {
+      initialData[field.key] = data?.[field.key] || ''
     })
-  }, [modelConfig.fields, modelConfig.customOptions, fetchData, data])
+    setFormData(initialData)
+  }, [data, modelConfig])
 
   const handleInputChange = (key, value) => {
     setFormData(prev => ({
@@ -83,14 +55,7 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
       const file = files[0]
       const result = await uploadFile(file)
       
-      if (field.type === 'file-multiple') {
-        const currentFiles = formData[field.key] || []
-        const newFiles = Array.isArray(currentFiles) ? [...currentFiles, result.url] : [result.url]
-        handleInputChange(field.key, newFiles)
-      } else {
-        handleInputChange(field.key, result.url)
-      }
-      
+      handleInputChange(field.key, result.url)
       setUploadedFiles(prev => ({
         ...prev,
         [field.key]: result
@@ -100,18 +65,12 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
     }
   }
 
-  const removeFile = (field, index = null) => {
-    if (field.type === 'file-multiple' && index !== null) {
-      const currentFiles = formData[field.key] || []
-      const newFiles = currentFiles.filter((_, i) => i !== index)
-      handleInputChange(field.key, newFiles)
-    } else {
-      handleInputChange(field.key, '')
-      setUploadedFiles(prev => ({
-        ...prev,
-        [field.key]: null
-      }))
-    }
+  const removeFile = (field) => {
+    handleInputChange(field.key, '')
+    setUploadedFiles(prev => ({
+      ...prev,
+      [field.key]: null
+    }))
   }
 
   const validateForm = () => {
@@ -142,26 +101,16 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
         }
       })
 
-      if (isEditing) {
-        await updateItem(model, item.id || item._id, submitData)
+      if (hasData) {
+        await updateSingletonItem(model, submitData)
       } else {
-        await createItem(model, submitData)
+        await createSingletonItem(model, submitData)
       }
       
       onSuccess()
     } catch (error) {
       console.error('Submit failed:', error)
     }
-  }
-
-  const getSelectOptions = (field) => {
-    // Check if using custom options
-    if (modelConfig.customOptions?.[field.options]) {
-      return modelConfig.customOptions[field.options]
-    }
-    
-    // Otherwise use fetched data
-    return data[field.options]?.data || []
   }
 
   const renderField = (field) => {
@@ -206,37 +155,6 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
               className={hasError ? 'border-red-500' : ''}
               rows={3}
             />
-            {hasError && (
-              <p className="text-red-500 text-sm flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {hasError}
-              </p>
-            )}
-          </div>
-        )
-
-      case 'select':
-        const options = getSelectOptions(field)
-        return (
-          <div key={field.key} className="space-y-2">
-            <Label htmlFor={field.key}>
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </Label>
-            <Select
-              value={value}
-              onValueChange={(newValue) => handleInputChange(field.key, newValue)}
-            >
-              <SelectTrigger className={hasError ? 'border-red-500' : ''}>
-                <SelectValue placeholder={`Select ${field.label}`} />
-              </SelectTrigger>
-              <SelectContent>
-                {options.map((option) => (
-                  <SelectItem key={option.id || option._id} value={option.id || option._id}>
-                    {option.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
             {hasError && (
               <p className="text-red-500 text-sm flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
@@ -301,65 +219,6 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
           </div>
         )
 
-      case 'file-multiple':
-        const files = Array.isArray(value) ? value : []
-        return (
-          <div key={field.key} className="space-y-2">
-            <Label htmlFor={field.key}>
-              {field.label} {field.required && <span className="text-red-500">*</span>}
-            </Label>
-            
-            {files.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
-                {files.map((file, index) => (
-                  <div key={index} className="relative">
-                    <Image
-                      src={`${IMG_URL}${file}`}
-                      alt={`Preview ${index + 1}`}
-                      width={80}
-                      height={80}
-                      className="w-full h-20 object-cover rounded"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-1 right-1 p-1 h-6 w-6"
-                      onClick={() => removeFile(field, index)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-              <input
-                type="file"
-                id={field.key}
-                accept="image/*"
-                multiple
-                onChange={(e) => e.target.files.length > 0 && handleFileUpload(field, e.target.files)}
-                className="hidden"
-              />
-              <label htmlFor={field.key} className="cursor-pointer">
-                <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                <p className="text-sm text-gray-600">
-                  Click to upload multiple images
-                </p>
-              </label>
-            </div>
-            
-            {hasError && (
-              <p className="text-red-500 text-sm flex items-center">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                {hasError}
-              </p>
-            )}
-          </div>
-        )
-
       default:
         return null
     }
@@ -383,7 +242,7 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
           Cancel
         </Button>
         <Button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
+          {loading ? 'Saving...' : (hasData ? 'Update' : 'Create')}
         </Button>
       </div>
     </form>
