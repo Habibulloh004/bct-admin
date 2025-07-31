@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { IMG_URL, useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
+import { MultilingualInput } from '@/components/MultilingualInput'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,11 +17,13 @@ import {
 } from '@/components/ui/select'
 import { Upload, X, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
+import { useLanguage } from '@/lib/LanguageContext'
 
 export default function CreateEditForm({ model, item = null, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({})
   const [uploadedFiles, setUploadedFiles] = useState({})
   const [errors, setErrors] = useState({})
+  const { t } = useLanguage()
   
   const { 
     createItem, 
@@ -169,6 +172,34 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
     const hasError = errors[field.key]
 
     switch (field.type) {
+      case 'multilingual':
+        return (
+          <div key={field.key} className="col-span-2">
+            <MultilingualInput
+              value={value}
+              onChange={(newValue) => handleInputChange(field.key, newValue)}
+              label={field.label}
+              required={field.required}
+              error={hasError}
+              type="text"
+            />
+          </div>
+        )
+
+      case 'multilingual-textarea':
+        return (
+          <div key={field.key} className="col-span-2">
+            <MultilingualInput
+              value={value}
+              onChange={(newValue) => handleInputChange(field.key, newValue)}
+              label={field.label}
+              required={field.required}
+              error={hasError}
+              type="textarea"
+            />
+          </div>
+        )
+
       case 'text':
       case 'email':
       case 'password':
@@ -287,7 +318,7 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
               <label htmlFor={field.key} className="cursor-pointer">
                 <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
                 <p className="text-sm text-gray-600">
-                  Click to upload or drag and drop
+                  {t("dnd")}
                 </p>
               </label>
             </div>
@@ -380,10 +411,10 @@ export default function CreateEditForm({ model, item = null, onSuccess, onCancel
       
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t('cancel')}
         </Button>
         <Button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : (isEditing ? 'Update' : 'Create')}
+          {loading ? 'Saving...' : (isEditing ? t('update') : t('create'))}
         </Button>
       </div>
     </form>

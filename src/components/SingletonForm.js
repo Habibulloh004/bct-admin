@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { IMG_URL, useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
+import { MultilingualInput } from '@/components/MultilingualInput'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -118,6 +119,34 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
     const hasError = errors[field.key]
 
     switch (field.type) {
+      case 'multilingual':
+        return (
+          <div key={field.key} className="col-span-2">
+            <MultilingualInput
+              value={value}
+              onChange={(newValue) => handleInputChange(field.key, newValue)}
+              label={field.label}
+              required={field.required}
+              error={hasError}
+              type="text"
+            />
+          </div>
+        )
+
+      case 'multilingual-textarea':
+        return (
+          <div key={field.key} className="col-span-2">
+            <MultilingualInput
+              value={value}
+              onChange={(newValue) => handleInputChange(field.key, newValue)}
+              label={field.label}
+              required={field.required}
+              error={hasError}
+              type="textarea"
+            />
+          </div>
+        )
+
       case 'text':
       case 'email':
       case 'password':

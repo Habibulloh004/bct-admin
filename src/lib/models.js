@@ -1,5 +1,236 @@
 export const MODELS = {
   // Core Business Models
+  "top-categories": {
+    name: "Top Categories",
+    icon: "FolderTree",
+    fields: [
+      { key: "name", label: "Name", type: "multilingual", required: true },
+      { key: "image", label: "Image", type: "file" },
+    ],
+    displayFields: ["name", "image", "created_at"],
+  },
+  categories: {
+    name: "Categories",
+    icon: "Folder",
+    fields: [
+      { key: "name", label: "Name", type: "multilingual", required: true },
+      { key: "image", label: "Image", type: "file" },
+      {
+        key: "top_category_id",
+        label: "Top Category",
+        type: "select",
+        options: "top-categories",
+      },
+    ],
+    displayFields: ["name", "image", "created_at"],
+  },
+  products: {
+    name: "Products",
+    icon: "Package",
+    fields: [
+      {
+        key: "name",
+        label: "Product Name",
+        type: "multilingual",
+        required: true,
+      },
+      { key: "ads_title", label: "Advertisement Title", type: "multilingual" },
+      { key: "image", label: "Product Images", type: "file-multiple" },
+      {
+        key: "description",
+        label: "Description",
+        type: "multilingual-textarea",
+        required: true,
+      },
+      { key: "guarantee", label: "Guarantee", type: "multilingual" },
+      { key: "serial_number", label: "Serial Number", type: "text" },
+      {
+        key: "category_id",
+        label: "Category",
+        type: "select",
+        options: "categories",
+      },
+    ],
+    displayFields: ["name", "ads_title", "category_id", "created_at"],
+  },
+
+  // Example for other models with multilingual support
+  // about: {
+  //   name: "About",
+  //   icon: "Info",
+  //   fields: [
+  //     {
+  //       key: "creation",
+  //       label: "Creation Info",
+  //       type: "multilingual-textarea",
+  //     },
+  //     { key: "clients", label: "Clients Info", type: "multilingual-textarea" },
+  //     {
+  //       key: "partners",
+  //       label: "Partners Info",
+  //       type: "multilingual-textarea",
+  //     },
+  //     {
+  //       key: "technologies",
+  //       label: "Technologies",
+  //       type: "multilingual-textarea",
+  //     },
+  //     { key: "scaners", label: "Scanners", type: "multilingual-textarea" },
+  //     { key: "scales", label: "Scales", type: "multilingual-textarea" },
+  //     { key: "printers", label: "Printers", type: "multilingual-textarea" },
+  //     { key: "cashiers", label: "Cashiers", type: "multilingual-textarea" },
+  //   ],
+  //   displayFields: ["creation", "clients", "partners"],
+  //   singleton: true,
+  // },
+  // contacts: {
+  //   name: "Contacts",
+  //   icon: "Contact",
+  //   fields: [
+  //     {
+  //       key: "company_name",
+  //       label: "Company Name",
+  //       type: "multilingual",
+  //       required: true,
+  //     },
+  //     { key: "phone1", label: "Phone 1", type: "text", required: true },
+  //     { key: "phone2", label: "Phone 2", type: "text" },
+  //     { key: "work_hours", label: "Work Hours", type: "multilingual" },
+  //     { key: "email", label: "Email", type: "email", required: true },
+  //     { key: "address", label: "Address", type: "multilingual-textarea" },
+  //     { key: "telegram", label: "Telegram", type: "text" },
+  //     { key: "telegram_bot", label: "Telegram Bot", type: "text" },
+  //     { key: "facebook", label: "Facebook", type: "text" },
+  //     { key: "instagram", label: "Instagram", type: "text" },
+  //     { key: "youtube", label: "YouTube", type: "text" },
+  //     {
+  //       key: "footer_info",
+  //       label: "Footer Info",
+  //       type: "multilingual-textarea",
+  //     },
+  //     {
+  //       key: "experience_info",
+  //       label: "Experience Info",
+  //       type: "multilingual-textarea",
+  //     },
+  //   ],
+  //   displayFields: ["company_name", "phone1", "email", "created_at"],
+  // },
+  // news: {
+  //   name: "News",
+  //   icon: "Newspaper",
+  //   fields: [
+  //     {
+  //       key: "name",
+  //       label: "News Title",
+  //       type: "multilingual",
+  //       required: true,
+  //     },
+  //     { key: "content", label: "News Content", type: "multilingual-textarea" },
+  //     { key: "image", label: "News Image", type: "file" },
+  //   ],
+  //   displayFields: ["name", "image", "created_at"],
+  // },
+  // partners: {
+  //   name: "Partners",
+  //   icon: "Handshake",
+  //   fields: [
+  //     {
+  //       key: "name",
+  //       label: "Partner Name",
+  //       type: "multilingual",
+  //       required: true,
+  //     },
+  //     {
+  //       key: "description",
+  //       label: "Description",
+  //       type: "multilingual-textarea",
+  //     },
+  //     { key: "image", label: "Partner Logo", type: "file" },
+  //   ],
+  //   displayFields: ["name", "image", "created_at"],
+  // },
+  // certificates: {
+  //   name: "Certificates",
+  //   icon: "Award",
+  //   fields: [
+  //     {
+  //       key: "name",
+  //       label: "Certificate Name",
+  //       type: "multilingual",
+  //       required: true,
+  //     },
+  //     {
+  //       key: "description",
+  //       label: "Description",
+  //       type: "multilingual-textarea",
+  //     },
+  //     { key: "image", label: "Certificate Image", type: "file" },
+  //   ],
+  //   displayFields: ["name", "image", "created_at"],
+  // },
+  // licenses: {
+  //   name: "Licenses",
+  //   icon: "FileCheck",
+  //   fields: [
+  //     {
+  //       key: "name",
+  //       label: "License Name",
+  //       type: "multilingual",
+  //       required: true,
+  //     },
+  //     {
+  //       key: "description",
+  //       label: "Description",
+  //       type: "multilingual-textarea",
+  //     },
+  //     { key: "image", label: "License Image", type: "file" },
+  //   ],
+  //   displayFields: ["name", "image", "created_at"],
+  // },
+};
+
+// Helper functions for multilingual data
+export const MultilingualHelpers = {
+  // Parse multilingual string "english***russian***uzbek" to object
+  parseMultilingual: (value) => {
+    if (!value || typeof value !== "string") return { en: "", ru: "", uz: "" };
+    const parts = value.split("***");
+    return {
+      en: parts[0] || "",
+      ru: parts[1] || "",
+      uz: parts[2] || "",
+    };
+  },
+
+  // Convert multilingual object to string "english***russian***uzbek"
+  formatMultilingual: (multilingualObj) => {
+    if (!multilingualObj || typeof multilingualObj !== "object") return "";
+    const { en = "", ru = "", uz = "" } = multilingualObj;
+    return `${en}***${ru}***${uz}`;
+  },
+
+  // Get display value for current language
+  getDisplayValue: (value, language = "en") => {
+    if (!value) return "";
+    if (typeof value === "string" && value.includes("***")) {
+      const parsed = MultilingualHelpers.parseMultilingual(value);
+      return parsed[language] || parsed.en || "";
+    }
+    return value;
+  },
+
+  // Language labels
+  languageLabels: {
+    en: "English",
+    ru: "Русский",
+    uz: "O'zbek",
+  },
+};
+
+
+// export const MODELS = {
+  // Core Business Models
   // 'clients': {
   //   name: 'Clients',
   //   icon: 'User',
@@ -13,39 +244,39 @@ export const MODELS = {
   //   ],
   //   displayFields: ['name', 'email', 'phone', 'created_at']
   // },
-  'top-categories': {
-    name: 'Top Categories',
-    icon: 'FolderTree',
-    fields: [
-      { key: 'name', label: 'Name', type: 'text', required: true },
-      { key: 'image', label: 'Image', type: 'file' }
-    ],
-    displayFields: ['name', 'image', 'created_at']
-  },
-  'categories': {
-    name: 'Categories',
-    icon: 'Folder',
-    fields: [
-      { key: 'name', label: 'Name', type: 'text', required: true },
-      { key: 'image', label: 'Image', type: 'file' },
-      { key: 'top_category_id', label: 'Top Category', type: 'select', options: 'top-categories' }
-    ],
-    displayFields: ['name', 'image', 'created_at']
-  },
-  'products': {
-    name: 'Products',
-    icon: 'Package',
-    fields: [
-      { key: 'name', label: 'Product Name', type: 'text', required: true },
-      { key: 'ads_title', label: 'Advertisement Title', type: 'text' },
-      { key: 'image', label: 'Product Images', type: 'file-multiple' },
-      { key: 'description', label: 'Description', type: 'textarea', required: true },
-      { key: 'guarantee', label: 'Guarantee', type: 'text' },
-      { key: 'serial_number', label: 'Serial Number', type: 'text' },
-      { key: 'category_id', label: 'Category', type: 'select', options: 'categories' }
-    ],
-    displayFields: ['name', 'ads_title', 'category_id', 'created_at']
-  },
+  // 'top-categories': {
+  //   name: 'Top Categories',
+  //   icon: 'FolderTree',
+  //   fields: [
+  //     { key: 'name', label: 'Name', type: 'text', required: true },
+  //     { key: 'image', label: 'Image', type: 'file' }
+  //   ],
+  //   displayFields: ['name', 'image', 'created_at']
+  // },
+  // 'categories': {
+  //   name: 'Categories',
+  //   icon: 'Folder',
+  //   fields: [
+  //     { key: 'name', label: 'Name', type: 'text', required: true },
+  //     { key: 'image', label: 'Image', type: 'file' },
+  //     { key: 'top_category_id', label: 'Top Category', type: 'select', options: 'top-categories' }
+  //   ],
+  //   displayFields: ['name', 'image', 'created_at']
+  // },
+  // 'products': {
+  //   name: 'Products',
+  //   icon: 'Package',
+  //   fields: [
+  //     { key: 'name', label: 'Product Name', type: 'text', required: true },
+  //     { key: 'ads_title', label: 'Advertisement Title', type: 'text' },
+  //     { key: 'image', label: 'Product Images', type: 'file-multiple' },
+  //     { key: 'description', label: 'Description', type: 'textarea', required: true },
+  //     { key: 'guarantee', label: 'Guarantee', type: 'text' },
+  //     { key: 'serial_number', label: 'Serial Number', type: 'text' },
+  //     { key: 'category_id', label: 'Category', type: 'select', options: 'categories' }
+  //   ],
+  //   displayFields: ['name', 'ads_title', 'category_id', 'created_at']
+  // },
   // 'orders': {
   //   name: 'Orders',
   //   icon: 'ShoppingCart',
@@ -272,4 +503,4 @@ export const MODELS = {
   //   ],
   //   displayFields: ['name', 'unique_id', 'category_id', 'created_at']
   // }
-};
+// };

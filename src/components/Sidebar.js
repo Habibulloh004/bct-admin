@@ -2,6 +2,7 @@
 
 import { useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
+import { useLanguage } from '@/lib/LanguageContext'
 import { cn } from '@/lib/utils'
 import { 
   MessageSquare, 
@@ -55,52 +56,66 @@ const iconMap = {
 
 const menuCategories = [
   {
-    title: 'Core Business',
-    items: ['clients', 'top-categories', 'categories', 'products', 'orders']
+    titleKey: 'coreBusiness',
+    items: ['top-categories', 'categories', 'products']
   },
   {
-    title: 'Information',
-    items: ['about', 'links', 'contacts']
+    titleKey: 'information',
+    items: ['about', 'contacts']
   },
   {
-    title: 'Media & Content',
-    items: ['vendors', 'projects', 'partners', 'news']
+    titleKey: 'mediaContent',
+    items: ['news', 'partners']
   },
   {
-    title: 'Reviews',
-    items: ['reviews', 'select-reviews']
-  },
-  {
-    title: 'Certificates',
-    items: ['sertificates', 'licenses']
-  },
-  {
-    title: 'System',
-    items: ['admins', 'currencies', 'banners', 'backgrounds']
-  },
-  {
-    title: 'Sorting',
-    items: ['banner-sorts', 'top-category-sorts', 'category-sorts']
+    titleKey: 'certificates',
+    items: ['certificates', 'licenses']
   }
 ]
 
 export default function Sidebar() {
   const { currentModel, setCurrentModel } = useStore()
+  const { t } = useLanguage()
+
+  const getCategoryTitle = (titleKey) => {
+    const categoryTitles = {
+      coreBusiness: 'Core Business',
+      information: 'Information',
+      mediaContent: 'Media & Content',
+      certificates: 'Certificates'
+    }
+    return categoryTitles[titleKey] || titleKey
+  }
+
+  const getModelName = (modelKey) => {
+    const modelNames = {
+      'top-categories': t('topCategories'),
+      'categories': t('categories'),
+      'products': t('products'),
+      'about': t('about'),
+      'contacts': t('contacts'),
+      'news': t('news'),
+      'partners': t('partners'),
+      'certificates': t('certificates'),
+      'licenses': t('licenses')
+    }
+    return modelNames[modelKey] || MODELS[modelKey]?.name || modelKey
+  }
 
   return (
     <div className="w-64 bg-white shadow-lg border-r h-full">
       <div className="p-6 border-b">
-        <h2 className="text-xl font-bold text-gray-800">Admin Panel</h2>
-        <p className="text-sm text-gray-500">E-commerce Backend</p>
+        <h2 className="text-xl font-bold text-gray-800">{t('adminPanel')}</h2>
+        {/* <p className="text-sm text-gray-500">{t('ecommerceBackend')}</p> */}
       </div>
       
       <nav className="p-4 overflow-y-auto h-[calc(100vh-88px)]">
         <div className="space-y-6">
           {menuCategories.map((category) => (
-            <div key={category.title}>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                {category.title}
-              </h3>
+            <div key={category.titleKey}>
+              {/* <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                {getCategoryTitle(category.titleKey)}
+              </h3> */}
               <div className="space-y-1">
                 {category.items.map((itemKey) => {
                   const item = MODELS[itemKey]
@@ -121,7 +136,7 @@ export default function Sidebar() {
                       )}
                     >
                       <Icon className="h-5 w-5" />
-                      <span className="text-sm font-medium">{item.name}</span>
+                      <span className="text-sm font-medium">{getModelName(itemKey)}</span>
                     </button>
                   )
                 })}

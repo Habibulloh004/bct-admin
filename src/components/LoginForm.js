@@ -2,16 +2,25 @@
 
 import { useState } from 'react'
 import { useStore } from '@/lib/store'
+import { useLanguage } from '@/lib/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertCircle } from 'lucide-react'
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { AlertCircle, Globe } from 'lucide-react'
 
 export default function LoginForm() {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const { login, loading, error, clearError } = useStore()
+  const { t, currentLanguage, changeLanguage, getAvailableLanguages } = useLanguage()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -25,12 +34,34 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+      {/* Language Selector - Top Right */}
+      <div className="fixed top-4 right-4 z-10">
+        <div className="flex items-center space-x-2 bg-white rounded-lg shadow-sm border px-3 py-2">
+          <Globe className="h-4 w-4 text-gray-500" />
+          <Select value={currentLanguage} onValueChange={changeLanguage}>
+            <SelectTrigger className="w-32 border-0 shadow-none p-0 h-auto">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {getAvailableLanguages().map((lang) => (
+                <SelectItem key={lang.code} value={lang.code}>
+                  <div className="flex items-center space-x-2 px-2">
+                    {/* <span>{lang.flag}</span> */}
+                    <span>{lang.nativeName}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Admin Login</CardTitle>
-          <CardDescription className="text-center">
-            Enter your admin credentials to access the dashboard
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl font-bold">{t('adminLogin')}</CardTitle>
+          <CardDescription>
+            {t('adminCredentials')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -43,11 +74,11 @@ export default function LoginForm() {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="name">Admin Name</Label>
+              <Label htmlFor="name">{t('adminName')}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Enter admin name"
+                placeholder={t('adminName')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -55,11 +86,11 @@ export default function LoginForm() {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter password"
+                placeholder={t('password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -71,7 +102,7 @@ export default function LoginForm() {
               className="w-full" 
               disabled={loading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? t('loggingIn') : t('login')}
             </Button>
           </form>
         </CardContent>
