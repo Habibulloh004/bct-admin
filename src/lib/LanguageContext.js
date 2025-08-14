@@ -43,6 +43,19 @@ const translations = {
     partners: "Partners",
     certificates: "Certificates",
     licenses: "Licenses",
+    reviews: "Reviews",
+    featuredReviews: "Featured Reviews",
+    admins: "Administrators",
+    currencies: "Currencies",
+    banners: "Banners",
+    backgrounds: "Backgrounds",
+    
+    // Category Types
+    coreBusiness: "Core Business",
+    information: "Information",
+    mediaContent: "Media & Content",
+    configuration: "Configuration",
+    singleton: "Single",
 
     // Form Fields
     name: "Name",
@@ -183,6 +196,17 @@ const translations = {
     partners: "Партнеры",
     certificates: "Сертификаты",
     licenses: "Лицензии",
+    featuredReviews: "Избранные отзывы",
+    admins: "Администраторы",
+    currencies: "Валюты",
+    banners: "Баннеры",
+    backgrounds: "Фоны",
+
+    coreBusiness: "Основной бизнес",
+    information: "Информация",
+    mediaContent: "Медиа и контент",
+    configuration: "Конфигурация",
+    singleton: "Одиночная",
 
     // Form Fields
     name: "Название",
@@ -324,6 +348,17 @@ const translations = {
     partners: "Hamkorlar",
     certificates: "Sertifikatlar",
     licenses: "Litsenziyalar",
+    featuredReviews: "Tanlangan sharhlar",
+    admins: "Administratorlar",
+    currencies: "Valyutalar",
+    banners: "Bannerlar",
+    backgrounds: "Fonlar",
+
+    coreBusiness: "Asosiy biznes",
+    information: "Ma'lumot",
+    mediaContent: "Media va kontent",
+    configuration: "Konfiguratsiya",
+    singleton: "Yagona",
 
     // Form Fields
     name: "Nomi",

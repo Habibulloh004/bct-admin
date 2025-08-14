@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { IMG_URL, useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
-import { MultilingualInput } from '@/components/MultilingualInput'
+import { FormLanguageProvider, FormLanguageSelector, MultilingualInput } from '@/components/MultilingualInput'
+import { useLanguage } from '@/lib/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,10 +13,24 @@ import { Upload, X, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 
 export default function SingletonForm({ model, data = null, onSuccess, onCancel }) {
+  return (
+    <FormLanguageProvider>
+      <SingletonFormContent
+        model={model}
+        data={data}
+        onSuccess={onSuccess}
+        onCancel={onCancel}
+      />
+    </FormLanguageProvider>
+  );
+}
+
+function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({})
   const [uploadedFiles, setUploadedFiles] = useState({})
   const [errors, setErrors] = useState({})
   
+  const { t } = useLanguage()
   const { 
     createSingletonItem, 
     updateSingletonItem, 
@@ -79,7 +94,7 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
     
     modelConfig.fields.forEach(field => {
       if (field.required && !formData[field.key]) {
-        newErrors[field.key] = `${field.label} is required`
+        newErrors[field.key] = `${field.label} ${t('required')}`
       }
     })
     
@@ -114,6 +129,36 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
     }
   }
 
+  const getFieldLabel = (field) => {
+    const fieldLabels = {
+      name: t("name"),
+      image: t("image"),
+      description: t("description"),
+      company_name: t("companyName"),
+      phone1: t("phone") + " 1",
+      phone2: t("phone") + " 2",
+      email: t("email"),
+      address: t("address"),
+      work_hours: t("workHours"),
+      telegram: "Telegram",
+      telegram_bot: "Telegram Bot",
+      facebook: "Facebook",
+      instagram: "Instagram",
+      youtube: "YouTube",
+      footer_info: t("footerInfo") || "Footer Info",
+      experience_info: t("experienceInfo") || "Experience Info",
+      creation: t("creationInfo") || "Creation Info",
+      clients: t("clientsInfo") || "Clients Info",
+      partners: t("partnersInfo") || "Partners Info",
+      technologies: t("technologies") || "Technologies",
+      scaners: t("scanners") || "Scanners",
+      scales: t("scales") || "Scales",
+      printers: t("printers") || "Printers",
+      cashiers: t("cashiers") || "Cashiers",
+    };
+    return fieldLabels[field.key] || field.label;
+  };
+
   const renderField = (field) => {
     const value = formData[field.key] || ''
     const hasError = errors[field.key]
@@ -125,7 +170,7 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
             <MultilingualInput
               value={value}
               onChange={(newValue) => handleInputChange(field.key, newValue)}
-              label={field.label}
+              label={getFieldLabel(field)}
               required={field.required}
               error={hasError}
               type="text"
@@ -139,7 +184,7 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
             <MultilingualInput
               value={value}
               onChange={(newValue) => handleInputChange(field.key, newValue)}
-              label={field.label}
+              label={getFieldLabel(field)}
               required={field.required}
               error={hasError}
               type="textarea"
@@ -153,7 +198,7 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
-              {field.label} {field.required && <span className="text-red-500">*</span>}
+              {getFieldLabel(field)} {field.required && <span className="text-red-500">*</span>}
             </Label>
             <Input
               id={field.key}
@@ -175,7 +220,7 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
-              {field.label} {field.required && <span className="text-red-500">*</span>}
+              {getFieldLabel(field)} {field.required && <span className="text-red-500">*</span>}
             </Label>
             <Textarea
               id={field.key}
@@ -197,7 +242,7 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
-              {field.label} {field.required && <span className="text-red-500">*</span>}
+              {getFieldLabel(field)} {field.required && <span className="text-red-500">*</span>}
             </Label>
             
             {value && (
@@ -234,7 +279,7 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
               <label htmlFor={field.key} className="cursor-pointer">
                 <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
                 <p className="text-sm text-gray-600">
-                  Click to upload or drag and drop
+                  {t('clickToUpload')}
                 </p>
               </label>
             </div>
@@ -262,16 +307,19 @@ export default function SingletonForm({ model, data = null, onSuccess, onCancel 
         </div>
       )}
       
+      {/* Global Language Selector */}
+      <FormLanguageSelector />
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {modelConfig.fields.map(renderField)}
       </div>
       
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t('cancel')}
         </Button>
         <Button type="submit" disabled={loading}>
-          {loading ? 'Saving...' : (hasData ? 'Update' : 'Create')}
+          {loading ? t('saving') : (hasData ? t('update') : t('create'))}
         </Button>
       </div>
     </form>

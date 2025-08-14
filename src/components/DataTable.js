@@ -3,10 +3,16 @@
 import { useState } from "react";
 import { IMG_URL, useStore } from "@/lib/store";
 import { MODELS, MultilingualHelpers } from "@/lib/models";
-import { MultilingualDisplay } from "@/components/MultilingualInput";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -26,16 +32,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Edit, Trash2, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Edit, Trash2, Search, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import Image from "next/image";
+
+// Utility function for getting translated values
+function getTranslatedValue(value, lang) {
+  if (!value) return ''
+
+  const parts = value.split('***')
+  const langMap = {
+    en: 0,
+    ru: 1,
+    uz: 2
+  }
+
+  const index = langMap[lang]
+  return parts[index] || parts[0] || ''
+}
 
 export default function DataTable({ model, data, onEdit, loading }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  // Local language state for table content only
+  const [tableLanguage, setTableLanguage] = useState("en");
+  
   const { deleteItem } = useStore();
 
-  // Use global language from header
-  const { t, currentLanguage } = useLanguage();
+  // Use global language for UI elements only
+  const { t, getAvailableLanguages } = useLanguage();
 
   const modelConfig = MODELS[model];
 
@@ -52,7 +76,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
   const limit = data.limit || 10;
   const totalPages = Math.ceil(total / limit);
 
-  // Get model name with translation
+  // Get model name with translation (uses global language for UI)
   const getModelName = (modelKey) => {
     const modelNames = {
       "top-categories": t("topCategories"),
@@ -68,19 +92,19 @@ export default function DataTable({ model, data, onEdit, loading }) {
     return modelNames[modelKey] || modelConfig?.name || modelKey;
   };
 
-  // Filter items based on search term (uses global language)
+  // Get available languages for table selector
+  const tableLanguages = getAvailableLanguages();
+
+  // Filter items based on search term (uses table language for content search)
   const filteredItems = items.filter((item) => {
     if (!searchTerm) return true;
     return modelConfig.displayFields.some((field) => {
       const value = item[field];
       if (!value) return false;
 
-      // For multilingual fields, search in the current global language
+      // For multilingual fields, search in the current table language
       if (typeof value === "string" && value.includes("***")) {
-        const displayValue = MultilingualHelpers.getDisplayValue(
-          value,
-          currentLanguage
-        );
+        const displayValue = getTranslatedValue(value, tableLanguage);
         return displayValue.toLowerCase().includes(searchTerm.toLowerCase());
       }
 
@@ -98,15 +122,10 @@ export default function DataTable({ model, data, onEdit, loading }) {
       return new Date(value).toLocaleDateString();
     }
 
-    // Handle multilingual fields (uses global language)
+    // Handle multilingual fields (uses table language instead of global language)
     if (typeof value === "string" && value.includes("***")) {
-      return (
-        <MultilingualDisplay
-          value={value}
-          language={currentLanguage}
-          fallbackToFirst={true}
-        />
-      );
+      const translatedValue = getTranslatedValue(value, tableLanguage);
+      return translatedValue || "-";
     }
 
     // Handle images
@@ -159,6 +178,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
     return value;
   };
 
+  // Field display names use global language for UI consistency
   const getFieldDisplayName = (field) => {
     const fieldNames = {
       name: t("name"),
@@ -169,6 +189,20 @@ export default function DataTable({ model, data, onEdit, loading }) {
       category_id: t("category"),
       top_category_id: t("topCategory"),
       ads_title: t("advertisementTitle"),
+      price: t("price") || "Price",
+      discount: t("discount") || "Discount",
+      guarantee: t("guarantee"),
+      serial_number: t("serialNumber"),
+      phone: t("phone"),
+      email: t("email"),
+      message: t("message"),
+      company_name: t("companyName"),
+      phone1: t("phone") + " 1",
+      phone2: t("phone") + " 2",
+      address: t("address"),
+      work_hours: t("workHours"),
+      sum: t("amount") || "Amount",
+      content: t("content") || "Content",
     };
 
     return (
@@ -205,7 +239,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
 
   return (
     <div className="space-y-4">
-      {/* Search and Stats - No separate language selector */}
+      {/* Search, Table Language Selector, and Stats */}
       <div className="flex items-center justify-between gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -219,16 +253,27 @@ export default function DataTable({ model, data, onEdit, loading }) {
           />
         </div>
 
-        {/* Current language indicator (optional - shows what language data is displayed in) */}
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
-          <span>{t("displaying")}:</span>
-          <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
-            {currentLanguage === "en"
-              ? "🇺🇸 English"
-              : currentLanguage === "ru"
-              ? "🇷🇺 Русский"
-              : "🇺🇿 O'zbek"}
+        {/* Table Language Selector - Only affects table content */}
+        <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-2 border">
+          <Globe className="h-4 w-4 text-gray-500" />
+          <span className="text-sm text-gray-600 font-medium">
+            {t("displaying")}:
           </span>
+          <Select value={tableLanguage} onValueChange={setTableLanguage}>
+            <SelectTrigger className="w-32 border-0 bg-transparent shadow-none p-0 h-auto">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {tableLanguages.map((lang) => (
+                <SelectItem key={lang.code} value={lang.code}>
+                  <div className="flex items-center space-x-2">
+                    <span>{lang.flag}</span>
+                    <span className="text-sm">{lang.nativeName}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="text-sm text-gray-500">

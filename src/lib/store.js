@@ -7,29 +7,24 @@ export const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL || "http://localhost:3000
 
 // API route mapping for models that have different endpoint names
 const API_ROUTE_MAP = {
-  // 'clients': 'clients',
-  // 'orders': 'orders',
   'top-categories': 'top-categories',
   'categories': 'categories',
   'products': 'products',
-  // 'about': 'about',
-  // 'links': 'links',
-  // 'contacts': 'contacts',
-  // 'vendors': 'vendors',
-  // 'projects': 'projects',
-  // 'partners': 'partners',
-  // 'news': 'news',
-  // 'reviews': 'reviews',
-  // 'select-reviews': 'select-reviews',
-  // 'sertificates': 'sertificates',
-  // 'licenses': 'licenses',
-  // 'admins': 'admins',
-  // 'currencies': 'currencies',
-  // 'banners': 'banners',
-  // 'backgrounds': 'backgrounds',
-  // 'banner-sorts': 'banner-sorts',
-  // 'top-category-sorts': 'top-category-sorts',
-  // 'category-sorts': 'category-sorts'
+  'about': 'about',
+  'contacts': 'contacts',
+  'news': 'news',
+  'partners': 'partners',
+  'sertificates': 'sertificates',
+  'licenses': 'licenses',
+  'reviews': 'reviews',
+  'select-reviews': 'select-reviews',
+  'admins': 'admins',
+  'currencies': 'currencies',
+  'banners': 'banners',
+  'backgrounds': 'backgrounds',
+  'banner-sorts': 'banner-sorts',
+  'top-category-sorts': 'top-category-sorts',
+  'category-sorts': 'category-sorts'
 };
 
 export const useStore = create(
@@ -46,7 +41,7 @@ export const useStore = create(
       error: null,
       
       // Current model state (persisted to survive refreshes)
-      currentModel: 'clients',
+      currentModel: 'top-categories',
       
       // Initialize auth from localStorage
       initAuth: () => {
@@ -177,6 +172,12 @@ export const useStore = create(
         return API_ROUTE_MAP[model] || model;
       },
       
+      // Check if model is singleton
+      isSingletonModel: (model) => {
+        const singletonModels = ['about', 'contacts'];
+        return singletonModels.includes(model);
+      },
+      
       // CRUD actions
       fetchData: async (model, params = {}) => {
         set({ loading: true, error: null });
@@ -220,7 +221,11 @@ export const useStore = create(
           const response = await axios.post(url, data);
           
           // Refresh the data
-          await get().fetchData(model);
+          if (get().isSingletonModel(model)) {
+            await get().fetchSingletonData(model);
+          } else {
+            await get().fetchData(model);
+          }
           
           set({ loading: false });
           return response.data;
@@ -246,7 +251,11 @@ export const useStore = create(
           const response = await axios.put(url, data);
           
           // Refresh the data
-          await get().fetchData(model);
+          if (get().isSingletonModel(model)) {
+            await get().fetchSingletonData(model);
+          } else {
+            await get().fetchData(model);
+          }
           
           set({ loading: false });
           return response.data;
@@ -272,7 +281,11 @@ export const useStore = create(
           await axios.delete(url);
           
           // Refresh the data
-          await get().fetchData(model);
+          if (get().isSingletonModel(model)) {
+            await get().fetchSingletonData(model);
+          } else {
+            await get().fetchData(model);
+          }
           
           set({ loading: false });
         } catch (error) {
@@ -286,7 +299,7 @@ export const useStore = create(
         }
       },
       
-      // Special handling for singleton models (about, links)
+      // Special handling for singleton models (about, contacts)
       fetchSingletonData: async (model) => {
         set({ loading: true, error: null });
         try {
@@ -297,17 +310,33 @@ export const useStore = create(
           
           const response = await axios.get(url);
           
+          // Check if response data is meaningful (not just empty object)
+          let responseData = response.data;
+          if (responseData && typeof responseData === 'object') {
+            // If it's an empty object or only has empty fields, treat as null
+            const hasContent = Object.keys(responseData).some(key => {
+              const value = responseData[key];
+              return value && value !== '' && key !== 'id' && key !== '_id' && 
+                     key !== 'created_at' && key !== 'updated_at';
+            });
+            
+            if (!hasContent) {
+              responseData = null;
+            }
+          }
+          
           set(state => ({
             data: {
               ...state.data,
-              [model]: response.data
+              [model]: responseData
             },
             loading: false
           }));
           
-          return response.data;
+          return responseData;
         } catch (error) {
           console.error(`Error fetching singleton ${model}:`, error.response?.data || error.message);
+          
           // For singletons, 404 is expected if no data exists yet
           if (error.response?.status === 404) {
             set(state => ({
@@ -315,7 +344,21 @@ export const useStore = create(
                 ...state.data,
                 [model]: null
               },
-              loading: false
+              loading: false,
+              error: null // Don't show error for expected 404
+            }));
+            return null;
+          }
+          
+          // For other errors, still set null but don't show error to user
+          if (error.response?.status >= 500) {
+            set(state => ({
+              data: {
+                ...state.data,
+                [model]: null
+              },
+              loading: false,
+              error: null // Don't show server errors for singletons
             }));
             return null;
           }

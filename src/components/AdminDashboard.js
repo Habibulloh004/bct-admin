@@ -600,6 +600,23 @@ function SingletonDisplay({
       work_hours: t("workHours"),
       created_at: t("createdAt"),
       updated_at: t("updatedAt"),
+      // About model fields
+      creation: t("creationInfo") || "Creation Info",
+      clients: t("clientsInfo") || "Clients Info", 
+      partners: t("partnersInfo") || "Partners Info",
+      technologies: t("technologies") || "Technologies",
+      scaners: t("scanners") || "Scanners",
+      scales: t("scales") || "Scales",
+      printers: t("printers") || "Printers",
+      cashiers: t("cashiers") || "Cashiers",
+      // Contact model fields
+      telegram: "Telegram",
+      telegram_bot: "Telegram Bot",
+      facebook: "Facebook",
+      instagram: "Instagram",
+      youtube: "YouTube",
+      footer_info: t("footerInfo") || "Footer Info",
+      experience_info: t("experienceInfo") || "Experience Info",
     };
     return (
       fieldTranslations[fieldKey] ||
