@@ -120,3 +120,210 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Rich text editor and display styles */
+.ql-editor {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.ql-editor h1 { font-size: 2em; }
+.ql-editor h2 { font-size: 1.5em; }
+.ql-editor h3 { font-size: 1.25em; }
+.ql-editor h4 { font-size: 1.1em; }
+.ql-editor h5 { font-size: 1em; }
+.ql-editor h6 { font-size: 0.9em; }
+
+.ql-editor p {
+  margin-bottom: 1em;
+}
+
+.ql-editor ul, .ql-editor ol {
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+
+.ql-editor ul li {
+  list-style-type: disc;
+}
+
+.ql-editor ol li {
+  list-style-type: decimal;
+}
+
+.ql-editor strong {
+  font-weight: 600;
+}
+
+.ql-editor em {
+  font-style: italic;
+}
+
+.ql-editor u {
+  text-decoration: underline;
+}
+
+.ql-editor s {
+  text-decoration: line-through;
+}
+
+.ql-editor a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.ql-editor a:hover {
+  color: #1d4ed8;
+}
+
+.ql-editor blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+/* Custom prose styles for display */
+.prose {
+  color: #374151;
+  max-width: none;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  color: #111827;
+  font-weight: 600;
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  line-height: 1.25;
+}
+
+.prose h1 { font-size: 1.875rem; }
+.prose h2 { font-size: 1.5rem; }
+.prose h3 { font-size: 1.25rem; }
+.prose h4 { font-size: 1.125rem; }
+.prose h5 { font-size: 1rem; }
+.prose h6 { font-size: 0.875rem; }
+
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+.prose ul, .prose ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.prose ul li {
+  list-style-type: disc;
+  margin-bottom: 0.25rem;
+}
+
+.prose ol li {
+  list-style-type: decimal;
+  margin-bottom: 0.25rem;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose u {
+  text-decoration: underline;
+}
+
+.prose s {
+  text-decoration: line-through;
+}
+
+.prose a {
+  color: #3b82f6;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.prose a:hover {
+  color: #1d4ed8;
+}
+
+.prose blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #6b7280;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+
+/* Smaller prose variant */
+.prose-sm {
+  font-size: 0.875rem;
+}
+
+.prose-sm h1 { font-size: 1.5rem; }
+.prose-sm h2 { font-size: 1.25rem; }
+.prose-sm h3 { font-size: 1.125rem; }
+.prose-sm h4 { font-size: 1rem; }
+.prose-sm h5 { font-size: 0.875rem; }
+.prose-sm h6 { font-size: 0.75rem; }
+
+.prose-sm p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.prose-sm ul, .prose-sm ol {
+  margin-bottom: 0.75rem;
+}
+
+/* Extra small prose variant */
+.prose-xs {
+  font-size: 0.75rem;
+}
+
+.prose-xs h1 { font-size: 1.25rem; }
+.prose-xs h2 { font-size: 1.125rem; }
+.prose-xs h3 { font-size: 1rem; }
+.prose-xs h4 { font-size: 0.875rem; }
+.prose-xs h5 { font-size: 0.75rem; }
+.prose-xs h6 { font-size: 0.625rem; }
+
+.prose-xs p {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.prose-xs ul, .prose-xs ol {
+  margin-bottom: 0.5rem;
+}
+
+/* Rich text editor placeholder */
+.rich-text-editor:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  font-style: italic;
+}
+
+.rich-text-editor:focus:empty:before {
+  color: #d1d5db;
+}

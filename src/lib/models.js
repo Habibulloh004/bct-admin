@@ -1,14 +1,14 @@
 export const MODELS = {
   // Core Business Models
-  "top-categories": {
-    name: "Top Categories",
-    icon: "FolderTree",
-    fields: [
-      { key: "name", label: "Name", type: "multilingual", required: true },
-      { key: "image", label: "Image", type: "file" },
-    ],
-    displayFields: ["name", "image", "created_at"],
-  },
+  // "top-categories": {
+  //   name: "Top Categories",
+  //   icon: "FolderTree",
+  //   fields: [
+  //     { key: "name", label: "Name", type: "multilingual", required: true },
+  //     { key: "image", label: "Image", type: "file" },
+  //   ],
+  //   displayFields: ["name", "image", "created_at"],
+  // },
   categories: {
     name: "Categories",
     icon: "Folder",
@@ -39,7 +39,7 @@ export const MODELS = {
       {
         key: "description",
         label: "Description",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
         required: true,
       },
       { key: "guarantee", label: "Guarantee", type: "multilingual" },
@@ -64,23 +64,43 @@ export const MODELS = {
       {
         key: "creation",
         label: "Creation Info",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
-      { key: "clients", label: "Clients Info", type: "multilingual-textarea" },
+      { 
+        key: "clients", 
+        label: "Clients Info", 
+        type: "multilingual-rich-text" // Changed to rich text
+      },
       {
         key: "partners",
         label: "Partners Info",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
       {
         key: "technologies",
         label: "Technologies",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
-      { key: "scaners", label: "Scanners", type: "multilingual-textarea" },
-      { key: "scales", label: "Scales", type: "multilingual-textarea" },
-      { key: "printers", label: "Printers", type: "multilingual-textarea" },
-      { key: "cashiers", label: "Cashiers", type: "multilingual-textarea" },
+      { 
+        key: "scaners", 
+        label: "Scanners", 
+        type: "multilingual-rich-text" // Changed to rich text
+      },
+      { 
+        key: "scales", 
+        label: "Scales", 
+        type: "multilingual-rich-text" // Changed to rich text
+      },
+      { 
+        key: "printers", 
+        label: "Printers", 
+        type: "multilingual-rich-text" // Changed to rich text
+      },
+      { 
+        key: "cashiers", 
+        label: "Cashiers", 
+        type: "multilingual-rich-text" // Changed to rich text
+      },
     ],
     displayFields: ["creation", "clients", "partners", "technologies"],
     singleton: true,
@@ -99,7 +119,11 @@ export const MODELS = {
       { key: "phone2", label: "Phone 2", type: "text" },
       { key: "work_hours", label: "Work Hours", type: "multilingual" },
       { key: "email", label: "Email", type: "email", required: true },
-      { key: "address", label: "Address", type: "multilingual-textarea" },
+      { 
+        key: "address", 
+        label: "Address", 
+        type: "multilingual-rich-text" // Changed to rich text
+      },
       { key: "telegram", label: "Telegram", type: "text" },
       { key: "telegram_bot", label: "Telegram Bot", type: "text" },
       { key: "facebook", label: "Facebook", type: "text" },
@@ -108,12 +132,12 @@ export const MODELS = {
       {
         key: "footer_info",
         label: "Footer Info",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
       {
         key: "experience_info",
         label: "Experience Info",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
     ],
     displayFields: ["company_name", "phone1", "email", "address"],
@@ -131,7 +155,11 @@ export const MODELS = {
         type: "multilingual",
         required: true,
       },
-      { key: "content", label: "News Content", type: "multilingual-textarea" },
+      { 
+        key: "content", 
+        label: "News Content", 
+        type: "multilingual-rich-text" // Changed to rich text
+      },
       { key: "image", label: "News Image", type: "file" },
     ],
     displayFields: ["name", "image", "created_at"],
@@ -149,7 +177,7 @@ export const MODELS = {
       {
         key: "description",
         label: "Description",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
       { key: "image", label: "Partner Logo", type: "file" },
     ],
@@ -170,7 +198,7 @@ export const MODELS = {
       {
         key: "description",
         label: "Description",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
       { key: "image", label: "Certificate Image", type: "file" },
     ],
@@ -189,7 +217,7 @@ export const MODELS = {
       {
         key: "description",
         label: "Description",
-        type: "multilingual-textarea",
+        type: "multilingual-rich-text", // Changed to rich text
       },
       { key: "image", label: "License Image", type: "file" },
     ],

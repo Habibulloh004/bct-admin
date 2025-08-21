@@ -3,7 +3,12 @@
 import { useState, useEffect } from 'react'
 import { IMG_URL, useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
-import { FormLanguageProvider, FormLanguageSelector, MultilingualInput } from '@/components/MultilingualInput'
+import { 
+  FormLanguageProvider, 
+  FormLanguageSelector, 
+  MultilingualInput 
+} from '@/components/MultilingualInput'
+import { MultilingualRichTextEditor } from '@/components/RichTextEditor'
 import { useLanguage } from '@/lib/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -188,6 +193,20 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
               required={field.required}
               error={hasError}
               type="textarea"
+            />
+          </div>
+        )
+
+      case 'multilingual-rich-text':
+        return (
+          <div key={field.key} className="col-span-2">
+            <MultilingualRichTextEditor
+              value={value}
+              onChange={(newValue) => handleInputChange(field.key, newValue)}
+              label={getFieldLabel(field)}
+              required={field.required}
+              error={hasError}
+              height="250px"
             />
           </div>
         )

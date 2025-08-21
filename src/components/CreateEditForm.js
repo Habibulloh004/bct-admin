@@ -8,6 +8,7 @@ import {
   FormLanguageSelector,
   MultilingualInput,
 } from "@/components/MultilingualInput";
+import { MultilingualRichTextEditor } from "@/components/RichTextEditor";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -203,6 +204,18 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       category_id: t("category"),
       top_category_id: t("topCategory"),
       product_name: t("productName"),
+      content: t("content") || "Content",
+      creation: t("creationInfo") || "Creation Info",
+      clients: t("clientsInfo") || "Clients Info",
+      partners: t("partnersInfo") || "Partners Info",
+      technologies: t("technologies") || "Technologies",
+      scaners: t("scanners") || "Scanners",
+      scales: t("scales") || "Scales",
+      printers: t("printers") || "Printers",
+      cashiers: t("cashiers") || "Cashiers",
+      address: t("address"),
+      footer_info: t("footerInfo") || "Footer Info",
+      experience_info: t("experienceInfo") || "Experience Info",
     };
     return fieldLabels[field.key] || field.label;
   };
@@ -236,6 +249,20 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
               required={field.required}
               error={hasError}
               type="textarea"
+            />
+          </div>
+        );
+
+      case "multilingual-rich-text":
+        return (
+          <div key={field.key} className="col-span-2">
+            <MultilingualRichTextEditor
+              value={value}
+              onChange={(newValue) => handleInputChange(field.key, newValue)}
+              label={getFieldLabel(field)}
+              required={field.required}
+              error={hasError}
+              height="250px"
             />
           </div>
         );
