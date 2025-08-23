@@ -66,9 +66,9 @@ export const MODELS = {
         label: "Creation Info",
         type: "multilingual-rich-text", // Changed to rich text
       },
-      { 
-        key: "clients", 
-        label: "Clients Info", 
+      {
+        key: "clients",
+        label: "Clients Info",
         type: "multilingual-rich-text" // Changed to rich text
       },
       {
@@ -81,24 +81,24 @@ export const MODELS = {
         label: "Technologies",
         type: "multilingual-rich-text", // Changed to rich text
       },
-      { 
-        key: "scaners", 
-        label: "Scanners", 
+      {
+        key: "scaners",
+        label: "Scanners",
         type: "multilingual-rich-text" // Changed to rich text
       },
-      { 
-        key: "scales", 
-        label: "Scales", 
+      {
+        key: "scales",
+        label: "Scales",
         type: "multilingual-rich-text" // Changed to rich text
       },
-      { 
-        key: "printers", 
-        label: "Printers", 
+      {
+        key: "printers",
+        label: "Printers",
         type: "multilingual-rich-text" // Changed to rich text
       },
-      { 
-        key: "cashiers", 
-        label: "Cashiers", 
+      {
+        key: "cashiers",
+        label: "Cashiers",
         type: "multilingual-rich-text" // Changed to rich text
       },
     ],
@@ -112,36 +112,34 @@ export const MODELS = {
       {
         key: "company_name",
         label: "Company Name",
-        type: "multilingual",
+        type: "text",
         required: true,
       },
-      { key: "phone1", label: "Phone 1", type: "text", required: true },
-      { key: "phone2", label: "Phone 2", type: "text" },
+      { key: "phone1", label: "Phone", type: "text", required: true },
       { key: "work_hours", label: "Work Hours", type: "multilingual" },
       { key: "email", label: "Email", type: "email", required: true },
-      { 
-        key: "address", 
-        label: "Address", 
-        type: "multilingual-rich-text" // Changed to rich text
+      {
+        key: "address",
+        label: "Address",
+        type: "multilingual" // Changed to rich text
       },
       { key: "telegram", label: "Telegram", type: "text" },
       { key: "telegram_bot", label: "Telegram Bot", type: "text" },
       { key: "facebook", label: "Facebook", type: "text" },
       { key: "instagram", label: "Instagram", type: "text" },
       { key: "youtube", label: "YouTube", type: "text" },
-      {
-        key: "footer_info",
-        label: "Footer Info",
-        type: "multilingual-rich-text", // Changed to rich text
-      },
-      {
-        key: "experience_info",
-        label: "Experience Info",
-        type: "multilingual-rich-text", // Changed to rich text
-      },
+      // {
+      //   key: "footer_info",
+      //   label: "Footer Info",
+      //   type: "multilingual-rich-text", // Changed to rich text
+      // },
+      // {
+      //   key: "experience_info",
+      //   label: "Experience Info",
+      //   type: "multilingual-rich-text", // Changed to rich text
+      // },
     ],
-    displayFields: ["company_name", "phone1", "email", "address"],
-    singleton: true,
+    displayFields: ["company_name", "phone1", "email"],
   },
 
   // Media and Content
@@ -155,9 +153,9 @@ export const MODELS = {
         type: "multilingual",
         required: true,
       },
-      { 
-        key: "content", 
-        label: "News Content", 
+      {
+        key: "content",
+        label: "News Content",
         type: "multilingual-rich-text" // Changed to rich text
       },
       { key: "image", label: "News Image", type: "file" },
@@ -186,12 +184,12 @@ export const MODELS = {
 
   // Certifications and Legal
   sertificates: {
-    name: "Certificates",
+    name: "Projects",
     icon: "Award",
     fields: [
       {
         key: "name",
-        label: "Certificate Name",
+        label: "Project Name",
         type: "multilingual",
         required: true,
       },
@@ -200,17 +198,17 @@ export const MODELS = {
         label: "Description",
         type: "multilingual-rich-text", // Changed to rich text
       },
-      { key: "image", label: "Certificate Image", type: "file" },
+      { key: "image", label: "Project Image", type: "file" },
     ],
     displayFields: ["name", "image", "created_at"],
   },
   licenses: {
-    name: "Licenses",
+    name: "Vendors",
     icon: "FileCheck",
     fields: [
       {
         key: "name",
-        label: "License Name",
+        label: "Vendors Name",
         type: "multilingual",
         required: true,
       },
@@ -219,7 +217,7 @@ export const MODELS = {
         label: "Description",
         type: "multilingual-rich-text", // Changed to rich text
       },
-      { key: "image", label: "License Image", type: "file" },
+      { key: "image", label: "Vendors Image", type: "file" },
     ],
     displayFields: ["name", "image", "created_at"],
   },

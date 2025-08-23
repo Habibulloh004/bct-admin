@@ -4,19 +4,19 @@ import { useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
 import { useLanguage } from '@/lib/LanguageContext'
 import { cn } from '@/lib/utils'
-import { 
-  MessageSquare, 
-  FolderTree, 
-  Folder, 
-  Package, 
-  Award, 
-  FileCheck, 
-  Newspaper, 
-  Handshake, 
-  Shield, 
-  DollarSign, 
-  Image, 
-  Wallpaper, 
+import {
+  MessageSquare,
+  FolderTree,
+  Folder,
+  Package,
+  Award,
+  FileCheck,
+  Newspaper,
+  Handshake,
+  Shield,
+  DollarSign,
+  Image,
+  Wallpaper,
   Contact,
   LayoutDashboard,
   User,
@@ -61,24 +61,20 @@ const menuCategories = [
   },
   {
     titleKey: 'information',
-    items: ['about', 'contacts']
+    items: ['contacts']
   },
   {
     titleKey: 'mediaContent',
-    items: ['news', 'partners']
+    items: ['partners', "licenses", "sertificates"]
   },
-  {
-    titleKey: 'certificates',
-    items: ['sertificates', 'licenses']
-  },
-  {
-    titleKey: 'reviews',
-    items: ['reviews', 'select-reviews']
-  },
-  {
-    titleKey: 'configuration',
-    items: ['admins', 'currencies', 'banners', 'backgrounds']
-  }
+  // {
+  //   titleKey: 'reviews',
+  //   items: ['reviews', 'select-reviews']
+  // },
+  // {
+  //   titleKey: 'configuration',
+  //   items: ['admins', 'currencies', 'banners', 'backgrounds']
+  // }
 ]
 
 export default function Sidebar() {
@@ -90,7 +86,7 @@ export default function Sidebar() {
       coreBusiness: t('coreBusiness') || 'Core Business',
       information: t('information') || 'Information',
       mediaContent: t('mediaContent') || 'Media & Content',
-      certificates: t('certificates') || 'Certificates',
+      certificates: t('certificates') || 'Projects',
       reviews: t('reviews') || 'Reviews',
       configuration: t('configuration') || 'Configuration'
     }
@@ -124,7 +120,7 @@ export default function Sidebar() {
         <h2 className="text-xl font-bold text-gray-800">{t('adminPanel')}</h2>
         <p className="text-sm text-gray-500">{t('ecommerceBackend') || 'E-commerce Backend'}</p>
       </div>
-      
+
       <nav className="flex-1 overflow-y-auto p-4">
         <div className="space-y-6 pb-6">
           {menuCategories.map((category) => (
@@ -136,10 +132,10 @@ export default function Sidebar() {
                 {category.items.map((itemKey) => {
                   const item = MODELS[itemKey]
                   if (!item) return null
-                  
+
                   const Icon = iconMap[item.icon] || LayoutDashboard
                   const isActive = currentModel === itemKey
-                  
+
                   return (
                     <button
                       key={itemKey}

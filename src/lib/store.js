@@ -184,7 +184,7 @@ export const useStore = create(
         try {
           const apiRoute = get().getApiRoute(model);
           const queryParams = new URLSearchParams(params).toString();
-          const url = `${API_BASE_URL}/${apiRoute}${queryParams ? `?${queryParams}` : ''}`;
+          const url = `${API_BASE_URL}/${apiRoute}${queryParams ? `?${queryParams}` : '?page=1&limit=20'}`;
           
           console.log(`Fetching data from: ${url}`); // Debug log
           

@@ -185,9 +185,8 @@ export default function AdminDashboard() {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <div
-        className={`transition-all duration-300 ${
-          sidebarCollapsed ? "w-16" : "w-64"
-        }`}
+        className={`transition-all duration-300 ${sidebarCollapsed ? "w-16" : "w-64"
+          }`}
       >
         <Sidebar
           collapsed={sidebarCollapsed}
@@ -209,11 +208,10 @@ export default function AdminDashboard() {
                     <div key={index} className="flex items-center space-x-2">
                       {index > 0 && <ChevronRight className="h-3 w-3" />}
                       <div
-                        className={`flex items-center space-x-1 ${
-                          path.active
+                        className={`flex items-center space-x-1 ${path.active
                             ? "text-gray-900 font-medium"
                             : "hover:text-gray-700"
-                        }`}
+                          }`}
                       >
                         {path.icon && <path.icon className="h-3 w-3" />}
                         <span>{path.name}</span>
@@ -229,11 +227,11 @@ export default function AdminDashboard() {
                 <p className="text-sm text-gray-500">
                   {isSingleton
                     ? `${t("manageData")} ${getModelName(
-                        currentModel
-                      ).toLowerCase()} ${t("information")}`
+                      currentModel
+                    ).toLowerCase()} ${t("information")}`
                     : `${t("manageAllRecords")} ${getModelName(
-                        currentModel
-                      ).toLowerCase()} ${t("records")}`}
+                      currentModel
+                    ).toLowerCase()} ${t("records")}`}
                   {isSingleton && (
                     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                       {t("singleRecord")}
@@ -406,11 +404,11 @@ export default function AdminDashboard() {
                       <CardDescription className="mt-1">
                         {isSingleton
                           ? `${t("manageData")} ${getModelName(
-                              currentModel
-                            ).toLowerCase()} ${t("information")}`
+                            currentModel
+                          ).toLowerCase()} ${t("information")}`
                           : `${t("manageAllRecords")} ${getModelName(
-                              currentModel
-                            ).toLowerCase()} ${t("records")}`}
+                            currentModel
+                          ).toLowerCase()} ${t("records")}`}
                       </CardDescription>
                     </div>
 
@@ -452,10 +450,12 @@ export default function AdminDashboard() {
                           onOpenChange={setIsCreateDialogOpen}
                         >
                           <DialogTrigger asChild>
-                            <Button className="flex items-center space-x-2 bg-green-600 hover:bg-green-700">
-                              <Plus className="h-4 w-4" />
-                              <span>{t("addNew")}</span>
-                            </Button>
+                            {currentModel !== "contacts" && (
+                              <Button className="flex items-center space-x-2 bg-green-600 hover:bg-green-700">
+                                <Plus className="h-4 w-4" />
+                                <span>{t("addNew")}</span>
+                              </Button>
+                            )}
                           </DialogTrigger>
                           <DialogContent className="min-w-3xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
@@ -602,7 +602,7 @@ function SingletonDisplay({
       updated_at: t("updatedAt"),
       // About model fields
       creation: t("creationInfo") || "Creation Info",
-      clients: t("clientsInfo") || "Clients Info", 
+      clients: t("clientsInfo") || "Clients Info",
       partners: t("partnersInfo") || "Partners Info",
       technologies: t("technologies") || "Technologies",
       scaners: t("scanners") || "Scanners",
@@ -696,9 +696,8 @@ function SingletonDisplay({
                   </div>
                 ) : (
                   <span
-                    className={`text-base ${
-                      value ? "text-gray-800" : "text-gray-400 italic"
-                    }`}
+                    className={`text-base ${value ? "text-gray-800" : "text-gray-400 italic"
+                      }`}
                   >
                     {value || t("notSet")}
                   </span>
