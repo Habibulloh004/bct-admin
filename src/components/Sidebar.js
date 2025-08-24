@@ -57,7 +57,7 @@ const iconMap = {
 const menuCategories = [
   {
     titleKey: 'coreBusiness',
-    items: ['top-categories', 'categories', 'products']
+    items: ['top-categories', 'categories', 'products', "banners"]
   },
   {
     titleKey: 'information',
