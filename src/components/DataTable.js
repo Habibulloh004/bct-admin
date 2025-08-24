@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { formatPrice } from "@/lib/utils";
 import { Edit, Trash2, Search, ChevronLeft, ChevronRight, Globe } from "lucide-react";
 import Image from "next/image";
 
@@ -112,20 +113,26 @@ export default function DataTable({ model, data, onEdit, loading }) {
     });
   });
 
+  const renderTruncated = (text) => (
+    <span className="block max-w-[250px] truncate" title={text}>
+      {text}
+    </span>
+  );
+
   const formatFieldValue = (item, field) => {
     const value = item[field];
 
-    if (!value) return "-";
+    if (!value) return renderTruncated("-");
 
     // Handle dates
     if (field.includes("_at") || field.includes("date")) {
-      return new Date(value).toLocaleDateString();
+      return renderTruncated(new Date(value).toLocaleDateString());
     }
 
     // Handle multilingual fields (uses table language instead of global language)
     if (typeof value === "string" && value.includes("***")) {
-      const translatedValue = getTranslatedValue(value, tableLanguage);
-      return translatedValue || "-";
+      const translatedValue = getTranslatedValue(value, tableLanguage) || "-";
+      return renderTruncated(translatedValue);
     }
 
     // Handle images
@@ -161,6 +168,10 @@ export default function DataTable({ model, data, onEdit, loading }) {
       );
     }
 
+    if (field === "price") {
+      return renderTruncated(formatPrice(value, tableLanguage));
+    }
+
     // Handle foreign key relationships
     if (field.endsWith("_id") && typeof value === "string") {
       return (
@@ -171,11 +182,11 @@ export default function DataTable({ model, data, onEdit, loading }) {
     }
 
     // Truncate long text
-    if (typeof value === "string" && value.length > 50) {
-      return <span title={value}>{value.substring(0, 50)}...</span>;
+    if (typeof value === "string" || typeof value === "number") {
+      return renderTruncated(value.toString());
     }
 
-    return value;
+    return renderTruncated(String(value));
   };
 
   // Field display names use global language for UI consistency

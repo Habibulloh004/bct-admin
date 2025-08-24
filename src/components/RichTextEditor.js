@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { 
@@ -46,13 +46,23 @@ export function MultilingualRichTextEditor({
     setMounted(true);
   }, []);
 
+  useLayoutEffect(() => {
+    const parsed = MultilingualHelpers.parseMultilingual(value);
+    setMultilingualValue(parsed);
+
+    if (mounted && editorRef.current) {
+      const content = parsed[currentFormLanguage] || "";
+      editorRef.current.innerHTML = content;
+    }
+  }, [value, currentFormLanguage, mounted]);
+
   // Update editor content when language changes
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (mounted && editorRef.current) {
       const content = multilingualValue[currentFormLanguage] || "";
       editorRef.current.innerHTML = content;
     }
-  }, [currentFormLanguage, mounted]);
+  }, [currentFormLanguage, multilingualValue, mounted]);
 
   const handleValueChange = () => {
     if (!editorRef.current) return;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -189,6 +189,10 @@ export function MultilingualInput({
   const [multilingualValue, setMultilingualValue] = useState(() => {
     return MultilingualHelpers.parseMultilingual(value);
   });
+
+  useEffect(() => {
+    setMultilingualValue(MultilingualHelpers.parseMultilingual(value));
+  }, [value]);
 
   const currentLang = getCurrentLanguage();
 

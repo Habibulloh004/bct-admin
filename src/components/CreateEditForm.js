@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { IMG_URL, useStore } from "@/lib/store";
 import { MODELS } from "@/lib/models";
 import {
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Upload, X, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { getTranslatedValue } from "@/lib/utils";
+import { getTranslatedValue, formatPrice } from "@/lib/utils";
 
 export default function CreateEditForm({
   model,
@@ -44,7 +44,29 @@ export default function CreateEditForm({
 }
 
 function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
-  const [formData, setFormData] = useState({});
+  const modelConfig = MODELS[model];
+
+  const initializeFormData = useCallback(() => {
+    const initialData = {};
+    modelConfig.fields.forEach((field) => {
+      if (item) {
+        if (field.type === "select") {
+          const value = item[field.key];
+          initialData[field.key] =
+            typeof value === "object"
+              ? value?.id?.toString() || value?._id?.toString() || ""
+              : value?.toString() || "";
+        } else {
+          initialData[field.key] = item[field.key] || "";
+        }
+      } else {
+        initialData[field.key] = "";
+      }
+    });
+    return initialData;
+  }, [item, modelConfig]);
+
+  const [formData, setFormData] = useState(initializeFormData);
   const [uploadedFiles, setUploadedFiles] = useState({});
   const [errors, setErrors] = useState({});
 
@@ -59,25 +81,12 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
     error,
   } = useStore();
 
-  const modelConfig = MODELS[model];
   const isEditing = !!item;
 
   // Initialize form data
   useEffect(() => {
-    if (item) {
-      const initialData = {};
-      modelConfig.fields.forEach((field) => {
-        initialData[field.key] = item[field.key] || "";
-      });
-      setFormData(initialData);
-    } else {
-      const initialData = {};
-      modelConfig.fields.forEach((field) => {
-        initialData[field.key] = "";
-      });
-      setFormData(initialData);
-    }
-  }, [item, modelConfig]);
+    setFormData(initializeFormData());
+  }, [initializeFormData]);
 
   // Fetch options for select fields
   useEffect(() => {
@@ -187,10 +196,30 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
   };
 
   const getSelectOptions = (field) => {
+    let options = [];
     if (modelConfig.customOptions?.[field.options]) {
-      return modelConfig.customOptions[field.options];
+      options = modelConfig.customOptions[field.options];
+    } else {
+      options = data[field.options]?.data || [];
     }
-    return data[field.options]?.data || [];
+    if (item && field.key.endsWith("_id")) {
+      const currentId = item[field.key];
+      const nameKey = field.key.replace("_id", "_name");
+      const currentName = item[nameKey];
+
+      if (
+        currentId &&
+        currentName &&
+        !options.some((opt) => (opt.id || opt._id)?.toString() === currentId.toString())
+      ) {
+        options = [
+          ...options,
+          { id: currentId, name: currentName },
+        ];
+      }
+    }
+
+    return options;
   };
 
   const getFieldLabel = (field) => {
@@ -270,6 +299,7 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       case "text":
       case "email":
       case "password":
+        const isPriceField = field.key === "price" || field.key === "discount";
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
@@ -279,8 +309,18 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
             <Input
               id={field.key}
               type={field.type}
-              value={value}
-              onChange={(e) => handleInputChange(field.key, e.target.value)}
+              inputMode={isPriceField ? "numeric" : undefined}
+              value={
+                isPriceField ? formatPrice(value, currentLanguage) : value
+              }
+              onChange={(e) =>
+                handleInputChange(
+                  field.key,
+                  isPriceField
+                    ? e.target.value.replace(/[^0-9]/g, "")
+                    : e.target.value
+                )
+              }
               className={hasError ? "border-red-500" : ""}
             />
             {hasError && (
@@ -324,7 +364,7 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
               {field.required && <span className="text-red-500">*</span>}
             </Label>
             <Select
-              value={value}
+              value={value ? value.toString() : undefined}
               onValueChange={(newValue) =>
                 handleInputChange(field.key, newValue)
               }
@@ -335,14 +375,18 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
                 />
               </SelectTrigger>
               <SelectContent>
-                {options.map((option) => (
-                  <SelectItem
-                    key={option.id || option._id}
-                    value={option.id || option._id}
-                  >
-                    {getTranslatedValue(option.name, currentLanguage)}
-                  </SelectItem>
-                ))}
+                {options.map((option) => {
+                  const optionValue = (option.id || option._id).toString();
+                  const optionLabel =
+                    typeof option.name === "string"
+                      ? getTranslatedValue(option.name, currentLanguage)
+                      : option.name?.[currentLanguage] || option.name?.en || "";
+                  return (
+                    <SelectItem key={optionValue} value={optionValue}>
+                      {optionLabel}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
             {hasError && (
