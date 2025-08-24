@@ -15,12 +15,6 @@ export const MODELS = {
     fields: [
       { key: "name", label: "Name", type: "multilingual", required: true },
       { key: "image", label: "Image", type: "file" },
-      {
-        key: "top_category_id",
-        label: "Top Category",
-        type: "select",
-        options: "top-categories",
-      },
     ],
     displayFields: ["name", "image", "created_at"],
   },
@@ -258,7 +252,7 @@ export const MODELS = {
     icon: "Image",
     fields: [
       { key: "image", label: "Banner Image", type: "file", required: true },
-      { key: "top_category_id", label: "Top Category", type: "select", options: "top-categories" },
+      // { key: "top_category_id", label: "Top Category", type: "select", options: "top-categories" },
       { key: "category_id", label: "Category", type: "select", options: "categories" },
       { key: "product_id", label: "Product", type: "select", options: "products" }
     ],
