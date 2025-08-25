@@ -49,7 +49,7 @@ const translations = {
     currencies: "Currencies",
     banners: "Banners",
     backgrounds: "Backgrounds",
-    
+
     // Category Types
     coreBusiness: "Core Business",
     information: "Information",
@@ -155,6 +155,7 @@ const translations = {
     formLanguage: "Form Language",
     currentlyEditing: "Currently editing in",
     select: "Select",
+    recommendedImageSize: "Recommended: 16:9 format, 800x450 px"
   },
 
   ru: {
@@ -307,6 +308,7 @@ const translations = {
     formLanguage: "Язык формы",
     currentlyEditing: "Редактирование на",
     select: "Выберите",
+    recommendedImageSize: "Рекомендуется: формат 16:9, 800x450 пикселей"
   },
 
   uz: {
@@ -459,6 +461,7 @@ const translations = {
     formLanguage: "Forma tili",
     currentlyEditing: "Hozir tahrirlash",
     select: "Tanlang",
+    recommendedImageSize: "Tavsiya etiladi: 16:9 format, 800x450 px"
   },
 };
 

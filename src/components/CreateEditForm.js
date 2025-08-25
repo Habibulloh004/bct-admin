@@ -445,7 +445,9 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
                 <p className="text-sm text-gray-600">{t("clickToUpload")}</p>
               </label>
             </div>
-
+            <p className="text-xs text-gray-500">
+              {t("recommendedImageSize") || "Tavsiya etiladi: 16:9 format, 800x450 px"}
+            </p>
             {hasError && (
               <p className="text-red-500 text-sm flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
@@ -508,6 +510,9 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
                 </p>
               </label>
             </div>
+            <p className="text-xs text-gray-500">
+              {t("recommendedImageSize") || "Tavsiya etiladi: 16:9 format, 800x450 px"}
+            </p>
 
             {hasError && (
               <p className="text-red-500 text-sm flex items-center">
