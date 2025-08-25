@@ -163,13 +163,8 @@ export const MODELS = {
       {
         key: "name",
         label: "Partner Name",
-        type: "multilingual",
+        type: "text",
         required: true,
-      },
-      {
-        key: "description",
-        label: "Description",
-        type: "multilingual-rich-text", // Changed to rich text
       },
       { key: "image", label: "Partner Logo", type: "file" },
     ],
@@ -203,13 +198,8 @@ export const MODELS = {
       {
         key: "name",
         label: "Vendors Name",
-        type: "multilingual",
+        type: "text",
         required: true,
-      },
-      {
-        key: "description",
-        label: "Description",
-        type: "multilingual-rich-text", // Changed to rich text
       },
       { key: "image", label: "Vendors Image", type: "file" },
     ],
@@ -252,6 +242,18 @@ export const MODELS = {
     icon: "Image",
     fields: [
       { key: "image", label: "Banner Image", type: "file", required: true },
+      {
+        key: "title",
+        label: "Title",
+        type: "multilingual",
+        required: true,
+      },
+      {
+        key: "description",
+        label: "Description",
+        type: "multilingual",
+        required: true,
+      },
       // { key: "top_category_id", label: "Top Category", type: "select", options: "top-categories" },
       { key: "category_id", label: "Category", type: "select", options: "categories" },
       { key: "product_id", label: "Product", type: "select", options: "products" }
