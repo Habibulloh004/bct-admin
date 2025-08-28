@@ -99,6 +99,11 @@ export default function AdminDashboard() {
       partners: t("partners"),
       certificates: t("certificates"),
       licenses: t("licenses"),
+      "vendors-about": t("vendorsAbout"),
+      "official-partner": t("officialPartner"),
+      experiments: t("experiments"),
+      "company-stats": t("companyStats"),
+      discount: t("discount"),
     };
     return (
       modelTranslations[modelKey] || currentModelConfig?.name || t("dashboard")
@@ -209,8 +214,8 @@ export default function AdminDashboard() {
                       {index > 0 && <ChevronRight className="h-3 w-3" />}
                       <div
                         className={`flex items-center space-x-1 ${path.active
-                            ? "text-gray-900 font-medium"
-                            : "hover:text-gray-700"
+                          ? "text-gray-900 font-medium"
+                          : "hover:text-gray-700"
                           }`}
                       >
                         {path.icon && <path.icon className="h-3 w-3" />}
@@ -628,7 +633,7 @@ function SingletonDisplay({
     <div className="space-y-8">
       {/* Data Display Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {modelConfig.displayFields.map((field) => {
+        {modelConfig?.displayFields?.map((field) => {
           const value = data[field];
           const fieldConfig = modelConfig.fields.find((f) => f.key === field);
 

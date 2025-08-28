@@ -17,8 +17,14 @@ const API_ROUTE_MAP = {
   'partners': 'partners',
   'sertificates': 'sertificates',
   'licenses': 'licenses',
+  'vendors-about': 'vendors-about',
   'reviews': 'reviews',
+  'official-partner': 'official-partner',
+  experiments: 'experiments',
+  'company-stats': 'company-stats',
   'select-reviews': 'select-reviews',
+  discount: 'discount',
+  'select-products': 'select-products',
   'admins': 'admins',
   'currencies': 'currencies',
   'banners': 'banners',
@@ -27,6 +33,7 @@ const API_ROUTE_MAP = {
   'top-category-sorts': 'top-category-sorts',
   'category-sorts': 'category-sorts'
 };
+
 
 export const useStore = create(
   persist(
@@ -175,7 +182,7 @@ export const useStore = create(
 
       // Check if model is singleton
       isSingletonModel: (model) => {
-        const singletonModels = ['about', 'contacts'];
+        const singletonModels = ['about', 'contacts', 'discount', 'official-partner'];
         return singletonModels.includes(model);
       },
 

@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { IMG_URL, useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
-import { 
-  FormLanguageProvider, 
-  FormLanguageSelector, 
-  MultilingualInput 
+import {
+  FormLanguageProvider,
+  FormLanguageSelector,
+  MultilingualInput
 } from '@/components/MultilingualInput'
 import { MultilingualRichTextEditor } from '@/components/RichTextEditor'
 import { useLanguage } from '@/lib/LanguageContext'
@@ -16,6 +16,13 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Upload, X, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export default function SingletonForm({ model, data = null, onSuccess, onCancel }) {
   return (
@@ -34,16 +41,18 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
   const [formData, setFormData] = useState({})
   const [uploadedFiles, setUploadedFiles] = useState({})
   const [errors, setErrors] = useState({})
-  
+
   const { t } = useLanguage()
-  const { 
-    createSingletonItem, 
-    updateSingletonItem, 
-    uploadFile, 
-    loading, 
-    error 
+  const {
+    createSingletonItem,
+    updateSingletonItem,
+    uploadFile,
+    fetchData,
+    data: storeData,
+    loading,
+    error
   } = useStore()
-  
+
   const modelConfig = MODELS[model]
   const hasData = !!data
 
@@ -51,17 +60,36 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
   useEffect(() => {
     const initialData = {}
     modelConfig.fields.forEach(field => {
-      initialData[field.key] = data?.[field.key] || ''
+      initialData[field.key] =
+        data && data[field.key] !== undefined && data[field.key] !== null
+          ? data[field.key]
+          : field.default ?? ''
     })
     setFormData(initialData)
   }, [data, modelConfig])
+
+  // Fetch options for select fields
+  useEffect(() => {
+    const selectFields = modelConfig.fields.filter(
+      (field) => field.type === 'select'
+    )
+    selectFields.forEach((field) => {
+      if (
+        field.options &&
+        !modelConfig.customOptions?.[field.options] &&
+        !storeData[field.options]
+      ) {
+        fetchData(field.options)
+      }
+    })
+  }, [modelConfig.fields, modelConfig.customOptions, fetchData, storeData])
 
   const handleInputChange = (key, value) => {
     setFormData(prev => ({
       ...prev,
       [key]: value
     }))
-    
+
     // Clear error for this field
     if (errors[key]) {
       setErrors(prev => ({
@@ -75,7 +103,7 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
     try {
       const file = files[0]
       const result = await uploadFile(file)
-      
+
       handleInputChange(field.key, result.url)
       setUploadedFiles(prev => ({
         ...prev,
@@ -96,25 +124,25 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
 
   const validateForm = () => {
     const newErrors = {}
-    
+
     modelConfig.fields.forEach(field => {
       if (field.required && !formData[field.key]) {
         newErrors[field.key] = `${field.label} ${t('required')}`
       }
     })
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
-    
+
     try {
       const submitData = { ...formData }
-      
+
       // Clean up data
       Object.keys(submitData).forEach(key => {
         if (submitData[key] === '') {
@@ -127,7 +155,7 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
       } else {
         await createSingletonItem(model, submitData)
       }
-      
+
       onSuccess()
     } catch (error) {
       console.error('Submit failed:', error)
@@ -163,6 +191,17 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
     };
     return fieldLabels[field.key] || field.label;
   };
+
+  const getSelectOptions = (field) => {
+    let options = []
+    if (modelConfig.customOptions?.[field.options]) {
+      options = modelConfig.customOptions[field.options]
+    } else if (storeData[field.options]) {
+      options = storeData[field.options]
+    }
+    return options
+  }
+
 
   const renderField = (field) => {
     const value = formData[field.key] || ''
@@ -214,6 +253,8 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
       case 'text':
       case 'email':
       case 'password':
+      case 'number':
+        const isNumericField = field.type === 'number'
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
@@ -222,9 +263,14 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
             <Input
               id={field.key}
               type={field.type}
+              inputMode={isNumericField ? 'numeric' : undefined}
               value={value}
-              onChange={(e) => handleInputChange(field.key, e.target.value)}
-              className={hasError ? 'border-red-500' : ''}
+              onChange={(e) =>
+                handleInputChange(
+                  field.key,
+                  isNumericField ? e.target.value.replace(/[^0-9]/g, '') : e.target.value
+                )
+              } className={hasError ? 'border-red-500' : ''}
             />
             {hasError && (
               <p className="text-red-500 text-sm flex items-center">
@@ -257,13 +303,51 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
           </div>
         )
 
+      case 'select':
+        const options = getSelectOptions(field)
+        return (
+          <div key={field.key} className="space-y-2">
+            <Label htmlFor={field.key}>
+              {getFieldLabel(field)} {field.required && <span className="text-red-500">*</span>}
+            </Label>
+            <Select
+              value={value ? value.toString() : undefined}
+              onValueChange={(newValue) => handleInputChange(field.key, newValue)}
+            >
+              <SelectTrigger className={hasError ? 'border-red-500' : ''}>
+                <SelectValue placeholder={t('select') + ' ' + getFieldLabel(field)} />
+              </SelectTrigger>
+              <SelectContent>
+                {options?.map((option) => {
+                  const optionValue = (option.id || option._id).toString()
+                  const optionLabel =
+                    typeof option.name === 'string'
+                      ? option.name
+                      : option.name?.en || ''
+                  return (
+                    <SelectItem key={optionValue} value={optionValue}>
+                      {optionLabel}
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
+            {hasError && (
+              <p className="text-red-500 text-sm flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {hasError}
+              </p>
+            )}
+          </div>
+        )
+
       case 'file':
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
               {getFieldLabel(field)} {field.required && <span className="text-red-500">*</span>}
             </Label>
-            
+
             {value && (
               <div className="flex items-center space-x-2 p-2 border rounded">
                 <Image
@@ -286,7 +370,7 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
                 </Button>
               </div>
             )}
-            
+
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
               <input
                 type="file"
@@ -302,7 +386,7 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
                 </p>
               </label>
             </div>
-            
+
             {hasError && (
               <p className="text-red-500 text-sm flex items-center">
                 <AlertCircle className="h-4 w-4 mr-1" />
@@ -325,14 +409,14 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
           <span className="text-sm">{error}</span>
         </div>
       )}
-      
+
       {/* Global Language Selector */}
       <FormLanguageSelector />
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {modelConfig.fields.map(renderField)}
       </div>
-      
+
       <div className="flex justify-end space-x-2 pt-4 border-t">
         <Button type="button" variant="outline" onClick={onCancel}>
           {t('cancel')}

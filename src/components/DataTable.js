@@ -56,7 +56,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
   const [currentPage, setCurrentPage] = useState(1);
   // Local language state for table content only
   const [tableLanguage, setTableLanguage] = useState("en");
-  
+
   const { deleteItem } = useStore();
 
   // Use global language for UI elements only
@@ -89,6 +89,10 @@ export default function DataTable({ model, data, onEdit, loading }) {
       partners: t("partners"),
       certificates: t("certificates"),
       licenses: t("licenses"),
+      "vendors-about": t("vendorsAbout"),
+      experiments: t("experiments"),
+      "company-stats": t("companyStats"),
+      discount: t("discount"),
     };
     return modelNames[modelKey] || modelConfig?.name || modelKey;
   };
@@ -317,8 +321,8 @@ export default function DataTable({ model, data, onEdit, loading }) {
                   {searchTerm
                     ? t("noMatchingRecords")
                     : `${t("noDataAvailable")} ${getModelName(
-                        model
-                      ).toLowerCase()}`}
+                      model
+                    ).toLowerCase()}`}
                 </TableCell>
               </TableRow>
             ) : (

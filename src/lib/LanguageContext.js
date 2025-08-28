@@ -49,6 +49,11 @@ const translations = {
     currencies: "Currencies",
     banners: "Banners",
     backgrounds: "Backgrounds",
+    discount: "Discount",
+    vendorsAbout: "Vendors About",
+    officialPartner: "Official Partner",
+    experiments: "Experiments",
+    companyStats: "Company Stats",
 
     // Category Types
     coreBusiness: "Core Business",
@@ -202,6 +207,11 @@ const translations = {
     currencies: "Валюты",
     banners: "Баннеры",
     backgrounds: "Фоны",
+    discount: "Скидка",
+    vendorsAbout: "О вендорах",
+    officialPartner: "Официальный партнёр",
+    experiments: "Эксперименты",
+    companyStats: "Статистика компании",
 
     coreBusiness: "Основной бизнес",
     information: "Информация",
@@ -355,6 +365,11 @@ const translations = {
     currencies: "Valyutalar",
     banners: "Bannerlar",
     backgrounds: "Fonlar",
+    discount: "Chegirma",
+    vendorsAbout: "Vendorlar haqida",
+    officialPartner: "Rasmiy hamkor",
+    experiments: "Eksperimentlar",
+    companyStats: "Kompaniya statistikasi",
 
     coreBusiness: "Asosiy biznes",
     information: "Ma'lumot",

@@ -46,8 +46,27 @@ export const MODELS = {
         type: "select",
         options: "categories",
       },
+      // {
+      //   key: "active",
+      //   label: "Active",
+      //   type: "select",
+      //   options: "boolean",
+      // },
+      // { key: "index", label: "Index", type: "number", default: 0 },
     ],
-    displayFields: ["name", "ads_title", "price", "category_id", "created_at"],
+    displayFields: [
+      "name",
+      "ads_title",
+      "price",
+      "category_id",
+      "created_at",
+    ],
+    customOptions: {
+      boolean: [
+        { id: "true", name: "True" },
+        { id: "false", name: "False" },
+      ],
+    },
   },
 
   // Information Pages (Singleton Models)
@@ -170,8 +189,6 @@ export const MODELS = {
     ],
     displayFields: ["name", "image", "created_at"],
   },
-
-  // Certifications and Legal
   sertificates: {
     name: "Projects",
     icon: "Award",
@@ -198,10 +215,25 @@ export const MODELS = {
       {
         key: "name",
         label: "Vendors Name",
-        type: "text",
+        type: "multilingual",
         required: true,
       },
-      { key: "image", label: "Vendors Image", type: "file" },
+      { key: "image", label: "Vendors Image", type: "file", required: true },
+      {
+        key: "description",
+        label: "Vendors Name",
+        type: "multilingual",
+        required: true,
+      },
+    ],
+    displayFields: ["name", "image", "created_at"],
+  },
+  "vendors-about": {
+    name: "Vendors About",
+    icon: "FileCheck",
+    fields: [
+      { key: "name", label: "Vendors Name", type: "text" },
+      { key: "image", label: "Vendors Image", type: "file", required: true },
     ],
     displayFields: ["name", "image", "created_at"],
   },
@@ -217,6 +249,38 @@ export const MODELS = {
       { key: "message", label: "Review Message", type: "textarea", required: true }
     ],
     displayFields: ["name", "phone", "email", "created_at"]
+  },
+  "official-partner": {
+    name: "Official Partner",
+    icon: "Handshake",
+    fields: [
+      { key: "name", label: "Title", type: "multilingual", required: true },
+      { key: "image", label: "Vendors Image", type: "file", required: true },
+    ],
+    displayFields: ["name", "image", "created_at"],
+    singleton: true,
+  },
+  experiments: {
+    name: "Experiments",
+    icon: "Briefcase",
+    fields: [
+      { key: "count", label: "Count", type: "text" },
+      { key: "title", label: "Title", type: "multilingual" },
+      { key: "description", label: "Description", type: "multilingual" },
+    ],
+    displayFields: ["count", "title", "created_at"],
+  },
+
+  "company-stats": {
+    name: "Company Stats",
+    icon: "Building",
+    fields: [
+      { key: "count", label: "Count", type: "text" },
+      { key: "title", label: "Title", type: "multilingual" },
+      { key: "description", label: "Description", type: "multilingual" },
+      { key: "image", label: "Vendors Image", type: "file", required: true },
+    ],
+    displayFields: ["count", "title", "image", "created_at"],
   },
 
   // System Configuration
@@ -269,7 +333,27 @@ export const MODELS = {
     ],
     displayFields: ["name", "image", "created_at"]
   },
-
+  discount: {
+    name: "Discount",
+    icon: "Image",
+    fields: [
+      {
+        key: "title",
+        label: "Title",
+        type: "multilingual",
+        required: true,
+      },
+      { key: "product_id", label: "Product", type: "select", options: "products" }
+    ],
+    singleton: true,
+  },
+  "select-products": {
+    name: "Select Products",
+    icon: "Image",
+    fields: [
+      { key: "product_id", label: "Product", type: "select", options: "products" }
+    ]
+  },
   // Additional Models
   "select-reviews": {
     name: "Featured Reviews",

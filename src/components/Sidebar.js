@@ -57,11 +57,12 @@ const iconMap = {
 const menuCategories = [
   {
     titleKey: 'coreBusiness',
-    items: ['top-categories', 'categories', 'products', "banners"]
+    items: ['top-categories', 'categories', 'products', 'banners',]
   },
   {
     titleKey: 'information',
-    items: ['contacts']
+    // items: ['contacts', 'vendors-about', 'official-partner', 'experiments', 'company-stats']
+    items: ['contacts',]
   },
   {
     titleKey: 'mediaContent',
@@ -104,7 +105,12 @@ export default function Sidebar() {
       'partners': t('partners'),
       'sertificates': t('certificates'),
       'licenses': t('licenses'),
+      'vendors-about': t('vendorsAbout'),
       'reviews': t('reviews'),
+      'official-partner': t('officialPartner'),
+      experiments: t('experiments'),
+      'company-stats': t('companyStats'),
+      discount: t('discount'),
       'select-reviews': t('featuredReviews') || 'Featured Reviews',
       'admins': t('admins') || 'Administrators',
       'currencies': t('currencies') || 'Currencies',
