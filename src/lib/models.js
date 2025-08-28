@@ -215,7 +215,7 @@ export const MODELS = {
       {
         key: "name",
         label: "Vendors Name",
-        type: "multilingual",
+        type: "text",
         required: true,
       },
       { key: "image", label: "Vendors Image", type: "file", required: true },
