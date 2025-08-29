@@ -356,16 +356,14 @@ export const MODELS = {
   },
   // Additional Models
   "select-reviews": {
-    name: "Featured Reviews",
-    icon: "Star",
+    name: "Colors",
+    icon: "Color",
     fields: [
-      { key: "review_id", label: "Original Review", type: "select", options: "reviews" },
-      { key: "name", label: "Customer Name", type: "text", required: true },
-      { key: "phone", label: "Phone Number", type: "text", required: true },
-      { key: "email", label: "Email Address", type: "email", required: true },
-      { key: "message", label: "Review Message", type: "textarea", required: true }
+      { key: "name", label: "Color Name", type: "text", required: true },
+      { key: "email", label: "Color key", type: "text", required: true },
+      { key: "message", label: "Color", type: "select-color", required: true }
     ],
-    displayFields: ["name", "phone", "email", "created_at"]
+    displayFields: ["name", "email", "message", "created_at"]
   },
 };
 

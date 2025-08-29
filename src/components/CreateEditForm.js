@@ -155,13 +155,19 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       }));
     }
   };
-
   const validateForm = () => {
     const newErrors = {};
 
     modelConfig.fields.forEach((field) => {
-      if (field.required && !formData[field.key]) {
+      const v = formData[field.key];
+      if (field.required && !v) {
         newErrors[field.key] = `${field.label} ${t("required")}`;
+      }
+      // HEX tekshiruv faqat select-color turlari uchun
+      if (field.type === "select-color" && v) {
+        if (!isValidHex(v)) {
+          newErrors[field.key] = t("invalidColor") || "Invalid HEX color (#RRGGBB).";
+        }
       }
     });
 
@@ -245,9 +251,23 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       address: t("address"),
       footer_info: t("footerInfo") || "Footer Info",
       experience_info: t("experienceInfo") || "Experience Info",
+      color: t("color") || "Color",
     };
     return fieldLabels[field.key] || field.label;
   };
+  // Component tepasiga joylashtiring (CreateEditFormContent ichida emas, yoki uning ichida ham bo‘ladi)
+  const normalizeHex = (val) => {
+    if (!val) return "";
+    let v = val.trim();
+    if (!v.startsWith("#")) v = "#" + v;
+    if (v.length === 4) {
+      // #abc -> #aabbcc
+      v = "#" + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
+    }
+    return v.toUpperCase();
+  };
+
+  const isValidHex = (val) => /^#([0-9A-Fa-f]{6})$/.test(normalizeHex(val));
 
   const renderField = (field) => {
     const value = formData[field.key] || "";
@@ -267,6 +287,83 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
             />
           </div>
         );
+      case "select-color": {
+        const hex = formData[field.key] || "";
+        const normalized = hex ? normalizeHex(hex) : "#000000";
+
+        const setHex = (val) => {
+          const n = normalizeHex(val);
+          handleInputChange(field.key, n);
+          if (errors[field.key]) {
+            setErrors((prev) => ({ ...prev, [field.key]: null }));
+          }
+        };
+
+        const palette = Array.isArray(field.palette) ? field.palette : [];
+
+        return (
+          <div key={field.key} className="space-y-2">
+            <Label htmlFor={field.key}>
+              {getFieldLabel(field)}{" "}
+              {field.required && <span className="text-red-500">*</span>}
+            </Label>
+
+            <div className="flex items-center gap-3">
+              {/* Color picker */}
+              <input
+                aria-label="Pick color"
+                type="color"
+                value={isValidHex(normalized) ? normalized : "#000000"}
+                onChange={(e) => setHex(e.target.value)}
+                className="h-10 w-10 rounded border"
+              />
+
+              {/* HEX input */}
+              <Input
+                id={field.key}
+                value={normalized}
+                onChange={(e) => setHex(e.target.value)}
+                placeholder="#RRGGBB"
+                className={hasError ? "border-red-500" : ""}
+              />
+            </div>
+
+            {/* Palitra (ixtiyoriy) */}
+            {palette.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {palette.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setHex(c)}
+                    className="h-8 w-8 rounded-full border"
+                    style={{ backgroundColor: c }}
+                    title={c}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Ko‘rsatkich (preview) */}
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{t("selected") || "Selected"}:</span>
+              <span className="font-mono">{normalized}</span>
+              <span
+                className="inline-block h-4 w-4 rounded border"
+                style={{ backgroundColor: isValidHex(normalized) ? normalized : "#000000" }}
+              />
+            </div>
+
+            {hasError && (
+              <p className="text-red-500 text-sm flex items-center">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                {hasError}
+              </p>
+            )}
+          </div>
+        );
+      }
+
 
       case "multilingual-textarea":
         return (

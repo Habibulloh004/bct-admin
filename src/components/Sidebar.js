@@ -62,11 +62,11 @@ const menuCategories = [
   {
     titleKey: 'information',
     // items: ['contacts', 'vendors-about', 'official-partner', 'experiments', 'company-stats']
-    items: ['contacts',]
+    items: ['contacts',"select-reviews"]
   },
   {
     titleKey: 'mediaContent',
-    items: ['partners', "licenses", "sertificates"]
+    items: ['partners', "licenses","vendors-about", "sertificates"]
   },
   // {
   //   titleKey: 'reviews',

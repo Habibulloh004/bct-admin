@@ -498,7 +498,7 @@ export default function AdminDashboard() {
                       getModelName={getModelName}
                     />
                   ) : (
-                    <DataTable
+                    <DataTable 
                       model={currentModel}
                       data={currentData}
                       onEdit={handleEdit}
