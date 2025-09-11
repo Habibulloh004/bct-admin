@@ -142,7 +142,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
     // Handle images
     if (field === "image" && Array.isArray(value)) {
       return (
-        <div className="flex space-x-1">
+        <div className="bg-black/10 flex space-x-1">
           {value.slice(0, 2).map((img, idx) => (
             <Image
               key={idx}
@@ -167,7 +167,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
           alt="Preview"
           width={32}
           height={32}
-          className="w-8 h-8 object-cover rounded"
+          className="w-full h-12 object-contain  rounded p-2 bg-black/10"
         />
       );
     }
