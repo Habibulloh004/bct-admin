@@ -33,7 +33,7 @@ export const MODELS = {
       {
         key: "description",
         label: "Description",
-        type: "multilingual-rich-text", // Changed to rich text
+        type: "multilingual-table", // Changed to rich text
         required: true,
       },
       { key: "guarantee", label: "Guarantee", type: "multilingual" },
@@ -275,12 +275,11 @@ export const MODELS = {
     name: "Company Stats",
     icon: "Building",
     fields: [
-      { key: "count", label: "Count", type: "text" },
-      { key: "title", label: "Title", type: "multilingual" },
+      { key: "title", label: "Title", type: "text" },
       { key: "description", label: "Description", type: "multilingual" },
       { key: "image", label: "Vendors Image", type: "file", required: true },
     ],
-    displayFields: ["count", "title", "image", "created_at"],
+    displayFields: ["title", "image", "created_at"],
   },
 
   // System Configuration
@@ -345,6 +344,7 @@ export const MODELS = {
       },
       { key: "product_id", label: "Product", type: "select", options: "products" }
     ],
+    displayFields: ["title", "created_at"],
     singleton: true,
   },
   "select-products": {

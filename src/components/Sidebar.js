@@ -57,12 +57,12 @@ const iconMap = {
 const menuCategories = [
   {
     titleKey: 'coreBusiness',
-    items: ['top-categories', 'categories', 'products', 'banners',]
+    items: ['top-categories', 'categories', 'products', 'banners',"discount"]
   },
   {
     titleKey: 'information',
-    // items: ['contacts', 'vendors-about', 'official-partner', 'experiments', 'company-stats']
-    items: ['contacts',"select-reviews"]
+    items: ['contacts','official-partner', 'experiments', 'company-stats']
+    // items: ['contacts',"select-reviews",""]
   },
   {
     titleKey: 'mediaContent',

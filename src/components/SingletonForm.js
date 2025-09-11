@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { IMG_URL, useStore } from '@/lib/store'
-import { MODELS } from '@/lib/models'
+import { MODELS, MultilingualHelpers } from '@/lib/models'
 import {
   FormLanguageProvider,
   FormLanguageSelector,
@@ -42,7 +42,7 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
   const [uploadedFiles, setUploadedFiles] = useState({})
   const [errors, setErrors] = useState({})
 
-  const { t } = useLanguage()
+  const { t, currentLanguage } = useLanguage()
   const {
     createSingletonItem,
     updateSingletonItem,
@@ -197,7 +197,12 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
     if (modelConfig.customOptions?.[field.options]) {
       options = modelConfig.customOptions[field.options]
     } else if (storeData[field.options]) {
-      options = storeData[field.options]
+      const storeOptions = storeData[field.options]
+      if (Array.isArray(storeOptions)) {
+        options = storeOptions
+      } else if (Array.isArray(storeOptions.data)) {
+        options = storeOptions.data
+      }
     }
     return options
   }
@@ -320,10 +325,19 @@ function SingletonFormContent({ model, data = null, onSuccess, onCancel }) {
               <SelectContent>
                 {options?.map((option) => {
                   const optionValue = (option.id || option._id).toString()
-                  const optionLabel =
-                    typeof option.name === 'string'
-                      ? option.name
-                      : option.name?.en || ''
+                  const optionLabel = (() => {
+                    if (typeof option.name === 'string') {
+                      if (option.name.includes('***')) {
+                        const parsed = MultilingualHelpers.parseMultilingual(option.name)
+                        return parsed[currentLanguage] || parsed.en || ''
+                      }
+                      return option.name
+                    }
+                    if (typeof option.name === 'object') {
+                      return option.name?.[currentLanguage] || option.name?.en || ''
+                    }
+                    return ''
+                  })()
                   return (
                     <SelectItem key={optionValue} value={optionValue}>
                       {optionLabel}

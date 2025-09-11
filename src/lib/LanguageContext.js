@@ -78,8 +78,11 @@ const translations = {
     email: "Email",
     address: "Address",
     workHours: "Work Hours",
+    parameters: "Parameters",
+    size: "Size",
 
     // Messages
+    empty: "Empty",
     noDataAvailable: "No data available",
     noModelSelected: "No Model Selected",
     selectModelToStart:
@@ -235,8 +238,11 @@ const translations = {
     email: "Электронная почта",
     address: "Адрес",
     workHours: "Рабочие часы",
+    parameters: "Параметры",
+    size: "Размер",
 
     // Messages
+    empty: "Bo'sh",
     noDataAvailable: "Данные недоступны",
     noModelSelected: "Модель не выбрана",
     selectModelToStart:
@@ -393,8 +399,11 @@ const translations = {
     email: "Elektron pochta",
     address: "Manzil",
     workHours: "Ish vaqti",
+    parameters: "Parametrlar",
+    size: "Hajmi",
 
     // Messages
+    empty: "Bo'sh",
     noDataAvailable: "Ma'lumot mavjud emas",
     noModelSelected: "Model tanlanmagan",
     selectModelToStart: "Boshlash uchun yon paneldan modelni tanlang.",

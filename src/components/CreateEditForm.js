@@ -24,6 +24,7 @@ import {
 import { Upload, X, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { getTranslatedValue, formatPrice } from "@/lib/utils";
+import MultilingualTableInput from "./MultilingualTableInput";
 
 export default function CreateEditForm({
   model,
@@ -389,6 +390,18 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
               required={field.required}
               error={hasError}
               height="250px"
+            />
+          </div>
+        );
+      case "multilingual-table":
+        return (
+          <div key={field.key} className="col-span-2">
+            <MultilingualTableInput
+              value={value}
+              onChange={(newValue) => handleInputChange(field.key, newValue)}
+              label={getFieldLabel(field)}
+              required={field.required}
+              error={hasError}
             />
           </div>
         );
