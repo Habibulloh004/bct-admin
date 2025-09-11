@@ -222,7 +222,6 @@ export const MODELS = {
         key: "description",
         label: "Vendors Name",
         type: "multilingual",
-        required: true,
       },
     ],
     displayFields: ["name", "image", "created_at"],
