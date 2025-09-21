@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000/api';
 const API_REVALIDATE = process.env.NEXT_PUBLIC_API_REVALIDATE || 'https://bct-shop.vercel.app/api/revalidate';
+const API_CURRENCY = process.env.NEXT_PUBLIC_API_CURRENCY || 'http://localhost:3000';
 export const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL || "http://localhost:3000"
 
 // API route mapping for models that have different endpoint names
@@ -47,6 +48,8 @@ export const useStore = create(
       data: {},
       loading: false,
       error: null,
+      currency: 0,
+
 
       // Current model state (persisted to survive refreshes)
       currentModel: 'top-categories',
@@ -118,6 +121,24 @@ export const useStore = create(
             authChecked: true
           });
           throw new Error(errorMessage);
+        }
+      },
+      currencyGet: async (priceUsd = 100) => {
+        try {
+          const res = await fetch(API_CURRENCY + "/api/currency"); // caching backendda
+          const data = await res.json();
+          const rate = data.conversion_rates.UZS
+          console.log({ rate })
+
+          if (!rate) return null;
+          let total = priceUsd * rate;
+          total = total * 1.01;
+          total = Math.round(total / 1000) * 1000;
+          set({ currency: total / 100 })
+          return response.data[0].value
+        } catch (error) {
+          console.error('Error fetching currency:', error);
+          return 0;
         }
       },
 
@@ -192,7 +213,7 @@ export const useStore = create(
         try {
           const apiRoute = get().getApiRoute(model);
           const queryParams = new URLSearchParams(params).toString();
-          const url = `${API_BASE_URL}/${apiRoute}${queryParams ? `?${queryParams}` : '?page=1&limit=20'}`;
+          const url = `${API_BASE_URL}/${apiRoute}${queryParams ? `?${queryParams}` : '?page=1&limit=100'}`;
           console.log(`Fetching data from: ${url}`); // Debug log
 
           const response = await axios.get(url);

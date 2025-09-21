@@ -646,10 +646,18 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
           <span className="text-sm">{error}</span>
         </div>
       )}
+    
 
       {/* Global Language Selector */}
       <FormLanguageSelector />
-
+  <div className="flex justify-end space-x-2 pt-4 border-t">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          {t("cancel")}
+        </Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? t("saving") : isEditing ? t("update") : t("create")}
+        </Button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {modelConfig.fields.map(renderField)}
       </div>

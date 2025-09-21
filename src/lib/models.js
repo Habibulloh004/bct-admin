@@ -38,13 +38,14 @@ export const MODELS = {
       },
       { key: "guarantee", label: "Guarantee", type: "multilingual" },
       { key: "serial_number", label: "Serial Number", type: "text" },
-      { key: "price", label: "Price", type: "text" },
+      { key: "price", label: "Price($)", type: "text", required: true },
       { key: "discount", label: "Discount", type: "text" },
       {
         key: "category_id",
         label: "Category",
         type: "select",
         options: "categories",
+        required:true
       },
       // {
       //   key: "active",

@@ -68,6 +68,8 @@ export default function AdminDashboard() {
     loading,
     error,
     clearError,
+    currencyGet,
+    currency
   } = useStore();
 
   // Fetch data when model changes
@@ -80,6 +82,7 @@ export default function AdminDashboard() {
         fetchData(currentModel);
       }
     }
+    currencyGet(100)
   }, [currentModel, fetchData, fetchSingletonData]);
 
   // Get current model configuration and data
@@ -224,7 +227,9 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </nav>
-
+                <div>
+                  Курс доллара: {currency.toLocaleString()} UZS
+                </div>
                 {/* Main Title */}
                 <h1 className="text-2xl font-bold text-gray-900">
                   {getModelName(currentModel)}

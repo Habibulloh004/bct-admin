@@ -173,7 +173,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
     }
 
     if (field === "price") {
-      return renderTruncated(formatPrice(value, tableLanguage));
+      return renderTruncated(formatPrice(value + "$", tableLanguage))
     }
 
     // Handle foreign key relationships
@@ -204,7 +204,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
       category_id: t("category"),
       top_category_id: t("topCategory"),
       ads_title: t("advertisementTitle"),
-      price: t("price") || "Price",
+      price: t("price") || "Price($)",
       discount: t("discount") || "Discount",
       guarantee: t("guarantee"),
       serial_number: t("serialNumber"),
