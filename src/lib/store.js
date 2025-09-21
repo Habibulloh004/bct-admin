@@ -126,16 +126,13 @@ export const useStore = create(
       currencyGet: async (priceUsd = 100) => {
         try {
           const res = await fetch(API_CURRENCY + "/api/currency"); // caching backendda
-          const data = await res.json();
-          const rate = data.conversion_rates.UZS
+          const rate = await res.json();
           console.log({ rate })
-
           if (!rate) return null;
           let total = priceUsd * rate;
           total = total * 1.01;
           total = Math.round(total / 1000) * 1000;
           set({ currency: total / 100 })
-          return response.data[0].value
         } catch (error) {
           console.error('Error fetching currency:', error);
           return 0;
