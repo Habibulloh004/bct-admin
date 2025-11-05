@@ -1,11 +1,31 @@
+"use client";
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import axios from 'axios';
+import { getApi, postApi, putApi, deleteApi } from '@/actions/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000/api';
+const resolveClientBaseUrl = () => {
+  if (
+    process.env.NEXT_PUBLIC_BASE_URL &&
+    process.env.NEXT_PUBLIC_BASE_URL.trim() !== ''
+  ) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
+  if (typeof window !== 'undefined' && window.location) {
+    return `${window.location.origin.replace(/\/$/, '')}/api`;
+  }
+  return 'http://localhost:3000/api';
+};
 const API_REVALIDATE = process.env.NEXT_PUBLIC_API_REVALIDATE || 'https://bct-shop.vercel.app/api/revalidate';
 const API_CURRENCY = process.env.NEXT_PUBLIC_API_CURRENCY || 'http://localhost:3000';
 export const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL || "http://localhost:3000"
+
+const extractErrorMessage = (error, fallback) => {
+  if (!error) return fallback;
+  if (error.details?.error) return error.details.error;
+  if (error.details?.message) return error.details.message;
+  return error.message || fallback;
+};
 
 // API route mapping for models that have different endpoint names
 const API_ROUTE_MAP = {
@@ -43,6 +63,8 @@ export const useStore = create(
       user: null,
       isAuthenticated: false,
       authChecked: false, // New flag to track if auth has been checked
+      authToken: null,
+      resolveBaseUrl: resolveClientBaseUrl,
 
       // Data state
       data: {},
@@ -66,24 +88,23 @@ export const useStore = create(
               set({
                 user,
                 isAuthenticated: true,
-                authChecked: true
+                authChecked: true,
+                authToken: savedToken
               });
 
-              // Set authorization header for future requests
-              axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
               return true; // Return true if authenticated
             } catch (error) {
               localStorage.removeItem('admin_token');
               localStorage.removeItem('admin_user');
-              set({ authChecked: true });
+              set({ authChecked: true, authToken: null });
               return false;
             }
           } else {
-            set({ authChecked: true });
+            set({ authChecked: true, authToken: null });
             return false;
           }
         }
-        set({ authChecked: true });
+        set({ authChecked: true, authToken: null });
         return false;
       },
 
@@ -91,17 +112,20 @@ export const useStore = create(
       login: async (name, password) => {
         set({ loading: true, error: null });
         try {
-          const response = await axios.post(`${API_BASE_URL}/admin/login`, {
-            name,
-            password
-          });
+          const baseUrl = get().resolveBaseUrl();
+          const { data: response } = await postApi(
+            'admin/login',
+            { name, password },
+            { baseUrl }
+          );
 
-          const { token, admin } = response.data;
+          const { token, admin } = response;
           set({
             user: admin,
             isAuthenticated: true,
             authChecked: true,
-            loading: false
+            loading: false,
+            authToken: token,
           });
 
           if (typeof window !== 'undefined') {
@@ -109,16 +133,14 @@ export const useStore = create(
             localStorage.setItem('admin_user', JSON.stringify(admin));
           }
 
-          // Set default authorization header for future requests
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
           return admin;
         } catch (error) {
-          const errorMessage = error.response?.data?.error || 'Login failed';
+          const errorMessage = extractErrorMessage(error, 'Login failed');
           set({
             error: errorMessage,
             loading: false,
-            authChecked: true
+            authChecked: true,
+            authToken: null,
           });
           throw new Error(errorMessage);
         }
@@ -142,29 +164,33 @@ export const useStore = create(
       updateAdmin: async (name, password) => {
         set({ loading: true, error: null });
         try {
-          const response = await axios.put(`${API_BASE_URL}/admin/update`, {
-            name,
-            password
-          });
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
+          const { data: response } = await putApi(
+            'admin/update',
+            { name, password },
+            { token: authToken, baseUrl }
+          );
 
-          const { token, admin } = response.data;
+          const { token: newToken, admin } = response;
+          const effectiveToken = newToken || authToken;
           set({
             user: admin,
             isAuthenticated: true,
-            loading: false
+            loading: false,
+            authToken: effectiveToken || null,
           });
 
           if (typeof window !== 'undefined') {
-            localStorage.setItem('admin_token', token);
+            if (effectiveToken) {
+              localStorage.setItem('admin_token', effectiveToken);
+            }
             localStorage.setItem('admin_user', JSON.stringify(admin));
           }
 
-          // Update authorization header with new token
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
           return admin;
         } catch (error) {
-          const errorMessage = error.response?.data?.error || 'Update failed';
+          const errorMessage = extractErrorMessage(error, 'Update failed');
           set({
             error: errorMessage,
             loading: false
@@ -178,14 +204,13 @@ export const useStore = create(
           user: null,
           isAuthenticated: false,
           authChecked: true,
-          data: {} // Clear all data on logout
+          data: {}, // Clear all data on logout
+          authToken: null,
         });
         if (typeof window !== 'undefined') {
           localStorage.removeItem('admin_token');
           localStorage.removeItem('admin_user');
         }
-        // Remove authorization header
-        delete axios.defaults.headers.common['Authorization'];
       },
 
       // Set current model (this will be persisted)
@@ -204,28 +229,46 @@ export const useStore = create(
         return singletonModels.includes(model);
       },
 
+      getAuthToken: () => {
+        const stateToken = get().authToken;
+        if (stateToken) return stateToken;
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('admin_token');
+          if (token) {
+            set({ authToken: token });
+            return token;
+          }
+        }
+        return null;
+      },
+
       // CRUD actions
       fetchData: async (model, params = {}) => {
         set({ loading: true, error: null });
         try {
           const apiRoute = get().getApiRoute(model);
-          const queryParams = new URLSearchParams(params).toString();
-          const url = `${API_BASE_URL}/${apiRoute}${queryParams ? `?${queryParams}` : '?page=1&limit=100'}`;
-          console.log(`Fetching data from: ${url}`); // Debug log
+          const authToken = get().getAuthToken();
+          const queryParams = { page: 1, limit: 100, ...params };
+          const baseUrl = get().resolveBaseUrl();
 
-          const response = await axios.get(url);
+          const { data: response } = await getApi(apiRoute, {
+            params: queryParams,
+            token: authToken,
+            baseUrl,
+          });
+
           set(state => ({
             data: {
               ...state.data,
-              [model]: response.data
+              [model]: response
             },
             loading: false
           }));
 
-          return response.data;
+          return response;
         } catch (error) {
-          console.error(`Error fetching ${model}:`, error.response?.data || error.message);
-          const errorMessage = error.response?.data?.error || `Failed to fetch ${model}`;
+          console.error(`Error fetching ${model}:`, error);
+          const errorMessage = extractErrorMessage(error, `Failed to fetch ${model}`);
           set({
             error: errorMessage,
             loading: false
@@ -238,17 +281,19 @@ export const useStore = create(
         set({ loading: true, error: null });
         try {
           const apiRoute = get().getApiRoute(model);
-          const url = `${API_BASE_URL}/${apiRoute}`;
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
 
-          console.log(`Creating item at: ${url}`, data); // Debug log
-
-          const response = await axios.post(url, data);
-          const revalidate = await axios.post(API_REVALIDATE, {
-            tag: [
-              `${apiRoute}`
-            ]
+          const { data: response } = await postApi(apiRoute, data, {
+            token: authToken,
+            baseUrl,
           });
-          console.log({ revalidate })
+
+          try {
+            await postApi(API_REVALIDATE, { tag: [`${apiRoute}`] });
+          } catch (revalidateError) {
+            console.warn('Revalidate failed:', revalidateError);
+          }
 
           // Refresh the data
           if (get().isSingletonModel(model)) {
@@ -258,10 +303,10 @@ export const useStore = create(
           }
 
           set({ loading: false });
-          return response.data;
+          return response;
         } catch (error) {
-          console.error(`Error creating ${model}:`, error.response?.data || error.message);
-          const errorMessage = error.response?.data?.error || `Failed to create ${model}`;
+          console.error(`Error creating ${model}:`, error);
+          const errorMessage = extractErrorMessage(error, `Failed to create ${model}`);
           set({
             error: errorMessage,
             loading: false
@@ -274,17 +319,20 @@ export const useStore = create(
         set({ loading: true, error: null });
         try {
           const apiRoute = get().getApiRoute(model);
-          const url = `${API_BASE_URL}/${apiRoute}/${id}`;
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
 
-          console.log(`Updating item at: ${url}`, data); // Debug log
+          const { data: response } = await putApi(
+            `${apiRoute}/${id}`,
+            data,
+            { token: authToken, baseUrl }
+          );
 
-          const response = await axios.put(url, data);
-          const revalidate = await axios.post(API_REVALIDATE, {
-            tag: [
-              `${apiRoute}`
-            ]
-          });
-          console.log({ revalidate })
+          try {
+            await postApi(API_REVALIDATE, { tag: [`${apiRoute}`] });
+          } catch (revalidateError) {
+            console.warn('Revalidate failed:', revalidateError);
+          }
 
           // Refresh the data
           if (get().isSingletonModel(model)) {
@@ -294,10 +342,10 @@ export const useStore = create(
           }
 
           set({ loading: false });
-          return response.data;
+          return response;
         } catch (error) {
-          console.error(`Error updating ${model}:`, error.response?.data || error.message);
-          const errorMessage = error.response?.data?.error || `Failed to update ${model}`;
+          console.error(`Error updating ${model}:`, error);
+          const errorMessage = extractErrorMessage(error, `Failed to update ${model}`);
           set({
             error: errorMessage,
             loading: false
@@ -310,17 +358,19 @@ export const useStore = create(
         set({ loading: true, error: null });
         try {
           const apiRoute = get().getApiRoute(model);
-          const url = `${API_BASE_URL}/${apiRoute}/${id}`;
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
 
-          console.log(`Deleting item at: ${url}`); // Debug log
-
-          await axios.delete(url);
-          const revalidate = await axios.post(API_REVALIDATE, {
-            tag: [
-              `${apiRoute}`
-            ]
+          await deleteApi(`${apiRoute}/${id}`, {
+            token: authToken,
+            baseUrl,
           });
-          console.log({ revalidate })
+
+          try {
+            await postApi(API_REVALIDATE, { tag: [`${apiRoute}`] });
+          } catch (revalidateError) {
+            console.warn('Revalidate failed:', revalidateError);
+          }
 
           // Refresh the data
           if (get().isSingletonModel(model)) {
@@ -331,8 +381,8 @@ export const useStore = create(
 
           set({ loading: false });
         } catch (error) {
-          console.error(`Error deleting ${model}:`, error.response?.data || error.message);
-          const errorMessage = error.response?.data?.error || `Failed to delete ${model}`;
+          console.error(`Error deleting ${model}:`, error);
+          const errorMessage = extractErrorMessage(error, `Failed to delete ${model}`);
           set({
             error: errorMessage,
             loading: false
@@ -346,14 +396,16 @@ export const useStore = create(
         set({ loading: true, error: null });
         try {
           const apiRoute = get().getApiRoute(model);
-          const url = `${API_BASE_URL}/${apiRoute}`;
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
 
-          console.log(`Fetching singleton data from: ${url}`); // Debug log
-
-          const response = await axios.get(url);
+          const { data: response } = await getApi(apiRoute, {
+            token: authToken,
+            baseUrl,
+          });
 
           // Check if response data is meaningful (not just empty object)
-          let responseData = response.data;
+          let responseData = response;
           if (responseData && typeof responseData === 'object') {
             // If it's an empty object or only has empty fields, treat as null
             const hasContent = Object.keys(responseData).some(key => {
@@ -377,10 +429,10 @@ export const useStore = create(
 
           return responseData;
         } catch (error) {
-          console.error(`Error fetching singleton ${model}:`, error.response?.data || error.message);
+          console.error(`Error fetching singleton ${model}:`, error);
 
           // For singletons, 404 is expected if no data exists yet
-          if (error.response?.status === 404) {
+          if (error.status === 404) {
             set(state => ({
               data: {
                 ...state.data,
@@ -393,7 +445,7 @@ export const useStore = create(
           }
 
           // For other errors, still set null but don't show error to user
-          if (error.response?.status >= 500) {
+          if (error.status >= 500) {
             set(state => ({
               data: {
                 ...state.data,
@@ -405,7 +457,7 @@ export const useStore = create(
             return null;
           }
 
-          const errorMessage = error.response?.data?.error || `Failed to fetch ${model}`;
+          const errorMessage = extractErrorMessage(error, `Failed to fetch ${model}`);
           set({
             error: errorMessage,
             loading: false
@@ -418,20 +470,22 @@ export const useStore = create(
         set({ loading: true, error: null });
         try {
           const apiRoute = get().getApiRoute(model);
-          const url = `${API_BASE_URL}/${apiRoute}`;
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
 
-          console.log(`Updating singleton at: ${url}`, data); // Debug log
-
-          const response = await axios.put(url, data);
+          const { data: response } = await putApi(apiRoute, data, {
+            token: authToken,
+            baseUrl,
+          });
 
           // Refresh the data
           await get().fetchSingletonData(model);
 
           set({ loading: false });
-          return response.data;
+          return response;
         } catch (error) {
-          console.error(`Error updating singleton ${model}:`, error.response?.data || error.message);
-          const errorMessage = error.response?.data?.error || `Failed to update ${model}`;
+          console.error(`Error updating singleton ${model}:`, error);
+          const errorMessage = extractErrorMessage(error, `Failed to update ${model}`);
           set({
             error: errorMessage,
             loading: false
@@ -444,20 +498,22 @@ export const useStore = create(
         set({ loading: true, error: null });
         try {
           const apiRoute = get().getApiRoute(model);
-          const url = `${API_BASE_URL}/${apiRoute}`;
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
 
-          console.log(`Creating singleton at: ${url}`, data); // Debug log
-
-          const response = await axios.post(url, data);
+          const { data: response } = await postApi(apiRoute, data, {
+            token: authToken,
+            baseUrl,
+          });
 
           // Refresh the data
           await get().fetchSingletonData(model);
 
           set({ loading: false });
-          return response.data;
+          return response;
         } catch (error) {
-          console.error(`Error creating singleton ${model}:`, error.response?.data || error.message);
-          const errorMessage = error.response?.data?.error || `Failed to create ${model}`;
+          console.error(`Error creating singleton ${model}:`, error);
+          const errorMessage = extractErrorMessage(error, `Failed to create ${model}`);
           set({
             error: errorMessage,
             loading: false
@@ -472,16 +528,39 @@ export const useStore = create(
           const formData = new FormData();
           formData.append('file', file);
 
-          const response = await axios.post(`${API_BASE_URL}/files/upload`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
+          const authToken = get().getAuthToken();
+          const baseUrl = get().resolveBaseUrl();
+          const uploadUrl = `${baseUrl.replace(/\/$/, '')}/files/upload`;
+          const response = await fetch(uploadUrl, {
+            method: 'POST',
+            headers: authToken
+              ? {
+                  Authorization: authToken.startsWith('Bearer ')
+                    ? authToken
+                    : `Bearer ${authToken}`,
+                }
+              : undefined,
+            body: formData,
           });
 
+          if (!response.ok) {
+            const errorPayload = await response.json().catch(() => null);
+            const message =
+              errorPayload?.error ||
+              errorPayload?.message ||
+              'Failed to upload file';
+            throw Object.assign(new Error(message), {
+              status: response.status,
+              details: errorPayload,
+            });
+          }
+
+          const data = await response.json();
+
           set({ loading: false });
-          return response.data;
+          return data;
         } catch (error) {
-          const errorMessage = error.response?.data?.error || 'Failed to upload file';
+          const errorMessage = extractErrorMessage(error, 'Failed to upload file');
           set({
             error: errorMessage,
             loading: false

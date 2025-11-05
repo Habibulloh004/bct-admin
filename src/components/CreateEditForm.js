@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Upload, X, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { getTranslatedValue, formatPrice } from "@/lib/utils";
+import { getTranslatedValue } from "@/lib/utils";
 import MultilingualTableInput from "./MultilingualTableInput";
 
 export default function CreateEditForm({
@@ -410,6 +410,12 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       case "email":
       case "password":
         const isPriceField = field.key === "price" || field.key === "discount";
+        const sanitizeCurrencyInput = (inputValue) =>
+          inputValue.replace(/[^\d.,$\s]/g, "");
+        const displayValue =
+          isPriceField && typeof value === "number"
+            ? value.toString()
+            : value;
         return (
           <div key={field.key} className="space-y-2">
             <Label htmlFor={field.key}>
@@ -419,15 +425,13 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
             <Input
               id={field.key}
               type={field.type}
-              inputMode={isPriceField ? "numeric" : undefined}
-              value={
-                isPriceField ? formatPrice(value, currentLanguage) : value
-              }
+              inputMode={isPriceField ? "decimal" : undefined}
+              value={displayValue ?? ""}
               onChange={(e) =>
                 handleInputChange(
                   field.key,
                   isPriceField
-                    ? e.target.value.replace(/[^0-9]/g, "")
+                    ? sanitizeCurrencyInput(e.target.value)
                     : e.target.value
                 )
               }

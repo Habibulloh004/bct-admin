@@ -35,3 +35,29 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Product CRUD helpers
+
+Reusable multilingual product helpers live in `src/lib/productCrud.js`. Import `useProductCrud` inside client components to call `addProduct`, `updateProduct`, and `deleteProduct`, or reuse `buildProductPayload` when you need a pre-formatted payload:
+
+```js
+import { useProductCrud } from "@/lib/productCrud";
+
+const { addProduct, updateProduct, deleteProduct, buildProductPayload } = useProductCrud();
+```
+
+Each helper normalises English, Russian, and Uzbek fields into the `***`-delimited strings used throughout the admin panel and keeps the dynamic table description serialised in the format expected by the API.
+
+## Unified API actions
+
+Server-side API helpers in `src/actions/api.js` expose a single `apiRequest` wrapper (with `getApi`, `postApi`, `putApi`, and `deleteApi` aliases) that call your backend without CORS issues:
+
+```js
+import { getApi, postApi, deleteApi } from "@/actions/api";
+
+const { data } = await getApi("products", { token, params: { page: 1 } });
+await postApi("admin/login", { name, password });
+await deleteApi(`products/${id}`, { token });
+```
+
+These helpers run as Next.js server actions and support JSON bodies, query params, bearer auth, custom headers, and cache hints (`next`/`revalidate`). They are reused inside the Zustand store so every CRUD call (including login) now flows through the same entry point.

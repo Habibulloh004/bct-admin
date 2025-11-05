@@ -56,6 +56,7 @@ export const MODELS = {
       // { key: "index", label: "Index", type: "number", default: 0 },
     ],
     displayFields: [
+      "id",
       "name",
       "ads_title",
       "price",

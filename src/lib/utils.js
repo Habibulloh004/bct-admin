@@ -34,3 +34,38 @@ export function formatPrice(value, lang = 'en') {
 
   return number.toLocaleString(locale)
 }
+
+export function normalizeCurrencyValue(value) {
+  if (value === null || value === undefined) return "";
+  const stringValue = value.toString();
+  if (!stringValue) return "";
+
+  let cleaned = stringValue.replace(/[^\d.,-]/g, "").replace(/\s+/g, "");
+
+  if (!cleaned) return "";
+
+  const hasComma = cleaned.includes(",");
+  const hasDot = cleaned.includes(".");
+
+  if (hasComma && hasDot) {
+    const lastComma = cleaned.lastIndexOf(",");
+    const lastDot = cleaned.lastIndexOf(".");
+    if (lastComma > lastDot) {
+      cleaned = cleaned.replace(/\./g, "").replace(/,/g, ".");
+    } else {
+      cleaned = cleaned.replace(/,/g, "");
+    }
+  } else if (hasComma) {
+    cleaned = cleaned.replace(/,/g, ".");
+  }
+
+  cleaned = cleaned.replace(/[^0-9.]/g, "");
+
+  if (!cleaned) return "";
+
+  const parts = cleaned.split(".");
+  const integerPart = parts.shift() || "0";
+  const fractionalPart = parts.join("");
+
+  return fractionalPart ? `${integerPart}.${fractionalPart}` : integerPart;
+}

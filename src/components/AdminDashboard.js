@@ -83,7 +83,7 @@ export default function AdminDashboard() {
       }
     }
     currencyGet(100)
-  }, [currentModel, fetchData, fetchSingletonData]);
+  }, [currentModel, fetchData, fetchSingletonData, currencyGet]);
 
   // Get current model configuration and data
   const currentModelConfig = MODELS[currentModel];
