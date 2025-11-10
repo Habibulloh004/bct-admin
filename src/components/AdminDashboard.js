@@ -117,6 +117,14 @@ export default function AdminDashboard() {
   );
   const showPriceSyncFailureEllipsis =
     priceSyncFailureCount > priceSyncFailurePreviewDisplayed;
+  const formatUsdValue = (value) => {
+    if (value === undefined || value === null || value === "") {
+      return "—";
+    }
+    const stringValue = String(value).trim();
+    if (!stringValue) return "—";
+    return stringValue.startsWith("$") ? stringValue : `$${stringValue}`;
+  };
 
   // Get translated model name
   const getModelName = (modelKey) => {
@@ -754,7 +762,8 @@ export default function AdminDashboard() {
                             #{product.productId}
                           </span>
                           <span>
-                            {product.previousPrice || "—"} → {product.newPrice}
+                            {formatUsdValue(product.previousPrice)} →{" "}
+                            {formatUsdValue(product.newPrice)}
                           </span>
                         </div>
                       </div>
@@ -784,7 +793,7 @@ export default function AdminDashboard() {
                           <span className="font-medium">
                             #{product.productId}
                           </span>
-                          <span>{product.price || "—"}</span>
+                          <span>{formatUsdValue(product.price)}</span>
                         </div>
                       </div>
                     ))
