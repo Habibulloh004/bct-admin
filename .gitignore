@@ -31,6 +31,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 src/config/service-account.json
+src/app/api/sheets/service-account.json
 
 # env files (can opt-in for committing if needed)
 .env*
@@ -41,3 +42,5 @@ src/config/service-account.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+src/app/api/sheets/service-account.json
+src/app/api/sheets/service-account.json

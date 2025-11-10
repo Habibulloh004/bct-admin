@@ -43,6 +43,7 @@ import {
   RefreshCw,
   Home,
   ChevronRight,
+  FileSpreadsheet,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -54,6 +55,10 @@ export default function AdminDashboard() {
   const [isSingletonEditOpen, setIsSingletonEditOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [priceSyncing, setPriceSyncing] = useState(false);
+  const [priceSyncResult, setPriceSyncResult] = useState(null);
+  const [priceSyncError, setPriceSyncError] = useState(null);
+  const [isPriceSyncModalOpen, setIsPriceSyncModalOpen] = useState(false);
 
   // Language and store hooks
   const { t, currentLanguage, changeLanguage, getAvailableLanguages } =
@@ -69,7 +74,8 @@ export default function AdminDashboard() {
     error,
     clearError,
     currencyGet,
-    currency
+    currency,
+    getAuthToken
   } = useStore();
 
   // Fetch data when model changes
@@ -89,6 +95,28 @@ export default function AdminDashboard() {
   const currentModelConfig = MODELS[currentModel];
   const currentData = data[currentModel];
   const isSingleton = currentModelConfig?.singleton;
+  const priceSyncUpdatedProducts = priceSyncResult?.updatedProducts ?? [];
+  const priceSyncUnchangedProducts = priceSyncResult?.unchangedProducts ?? [];
+  const priceSyncUpdatedCount =
+    priceSyncResult?.updated ?? priceSyncUpdatedProducts.length;
+  const priceSyncSkippedCount = priceSyncResult?.skipped ?? 0;
+  const priceSyncFailures = priceSyncResult?.failures ?? [];
+  const priceSyncFailureCount = priceSyncFailures.length;
+  const priceSyncUnchangedCount =
+    priceSyncResult?.unchanged ?? priceSyncUnchangedProducts.length;
+  const priceSyncFailurePreview = priceSyncFailureCount
+    ? priceSyncFailures
+        .filter((failure) => !!failure?.productId)
+        .slice(0, 3)
+        .map((failure) => failure.productId)
+        .join(", ")
+    : "";
+  const priceSyncFailurePreviewDisplayed = Math.min(
+    priceSyncFailureCount,
+    3
+  );
+  const showPriceSyncFailureEllipsis =
+    priceSyncFailureCount > priceSyncFailurePreviewDisplayed;
 
   // Get translated model name
   const getModelName = (modelKey) => {
@@ -162,6 +190,52 @@ export default function AdminDashboard() {
     }
   };
 
+  const handlePriceSync = async () => {
+    if (priceSyncing) return;
+
+    const shouldProceed =
+      typeof window === "undefined" ||
+      window.confirm("Sync product prices and view summary?");
+
+    if (!shouldProceed) {
+      return;
+    }
+
+    setPriceSyncError(null);
+    setPriceSyncResult(null);
+    setIsPriceSyncModalOpen(true);
+
+    const token = getAuthToken?.();
+
+    if (!token) {
+      setPriceSyncError("Missing admin token. Please re-login.");
+      return;
+    }
+
+    setPriceSyncing(true);
+
+    try {
+      const response = await fetch("/api/products/sync-prices", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload?.error || "Failed to sync prices");
+      }
+
+      setPriceSyncResult(payload);
+    } catch (error) {
+      console.error("Price sync failed:", error);
+      setPriceSyncError(error.message || "Failed to sync prices");
+    } finally {
+      setPriceSyncing(false);
+    }
+  };
+
   const handleLogout = () => {
     if (window.confirm(t("areYouSure") + " " + t("logout") + "?")) {
       logout();
@@ -190,7 +264,8 @@ export default function AdminDashboard() {
 
   // Main dashboard render
   return (
-    <div className="flex h-screen bg-gray-50">
+    <>
+      <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <div
         className={`transition-all duration-300 ${sidebarCollapsed ? "w-16" : "w-64"
@@ -278,6 +353,25 @@ export default function AdminDashboard() {
                 </div>
               )}
 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePriceSync}
+                disabled={priceSyncing}
+                className="flex items-center space-x-2"
+                title="Sync product prices from Google Sheet"
+              >
+                <FileSpreadsheet
+                  className={`h-4 w-4 ${priceSyncing ? "animate-spin" : ""}`}
+                />
+                <span className="hidden sm:inline">
+                  {priceSyncing ? "Syncing..." : "Info Sync"}
+                </span>
+                <span className="sm:hidden">
+                  {priceSyncing ? "..." : "Info"}
+                </span>
+              </Button>
+
               {/* Global Language Selector */}
               <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-1">
                 <Globe className="h-4 w-4 text-gray-500" />
@@ -339,6 +433,59 @@ export default function AdminDashboard() {
         {/* Main Content */}
         <main className="flex-1 overflow-auto">
           <div className="p-6">
+            {priceSyncResult && (
+              <div
+                className={`mb-6 rounded-lg border p-4 shadow-sm ${priceSyncResult.success
+                  ? "border-green-200 bg-green-50 text-green-700"
+                  : "border-amber-200 bg-amber-50 text-amber-800"
+                  }`}
+              >
+                <p className="font-semibold">
+                  {priceSyncResult.success
+                    ? "Prices synced successfully"
+                    : "Prices synced with some issues"}
+                </p>
+                <p className="text-sm mt-1">
+                  Updated {priceSyncUpdatedCount} product
+                  {priceSyncUpdatedCount === 1 ? "" : "s"},{" "}
+                  {priceSyncUnchangedCount} unchanged, and skipped{" "}
+                  {priceSyncSkippedCount}.
+                </p>
+                {priceSyncFailureCount > 0 && (
+                  <p className="text-sm mt-1">
+                    Failed updates: {priceSyncFailureCount}
+                    {priceSyncFailurePreview && (
+                      <>
+                        {" "}
+                        ({priceSyncFailurePreview}
+                        {showPriceSyncFailureEllipsis && "..."}).
+                      </>
+                    )}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {priceSyncError && (
+              <div className="mb-6 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4 text-red-600 shadow-sm">
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">Price sync failed</p>
+                    <p className="text-sm">{priceSyncError}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPriceSyncError(null)}
+                  className="text-red-600 hover:bg-red-100 hover:text-red-700"
+                >
+                  ✕
+                </Button>
+              </div>
+            )}
+
             {/* Error Message */}
             {error && (
               <div className="mb-6 flex items-center justify-between text-red-600 bg-red-50 p-4 rounded-lg border border-red-200 shadow-sm">
@@ -543,6 +690,127 @@ export default function AdminDashboard() {
         </main>
       </div>
     </div>
+
+      <Dialog
+        open={isPriceSyncModalOpen}
+        onOpenChange={(open) => {
+          if (!priceSyncing || open) {
+            setIsPriceSyncModalOpen(open);
+          }
+        }}
+      >
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <FileSpreadsheet className="h-5 w-5" />
+              <span>Price Sync Summary</span>
+            </DialogTitle>
+          </DialogHeader>
+          {priceSyncing ? (
+            <div className="flex flex-col items-center space-y-4 py-6">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+              <p className="text-sm text-gray-600">Syncing data from Google Sheet...</p>
+            </div>
+          ) : priceSyncError ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <p className="font-medium mb-1">Price sync failed</p>
+              <p>{priceSyncError}</p>
+            </div>
+          ) : priceSyncResult ? (
+            <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-1">
+              <section>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold text-gray-900">
+                    Updated Products ({priceSyncUpdatedCount})
+                  </h4>
+                  <span className="text-sm text-gray-500">
+                    Skipped: {priceSyncSkippedCount}
+                  </span>
+                </div>
+                <div className="mt-3 space-y-2">
+                  {priceSyncUpdatedProducts.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      No products changed during the last sync.
+                    </p>
+                  ) : (
+                    priceSyncUpdatedProducts.map((product) => (
+                      <div
+                        key={product.productId}
+                        className="rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-900"
+                      >
+                        <div className="flex justify-between">
+                          <span className="font-medium">
+                            #{product.productId}
+                          </span>
+                          <span>
+                            {product.previousPrice || "—"} → {product.newPrice}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+
+              <section>
+                <h4 className="font-semibold text-gray-900">
+                  Unchanged Products ({priceSyncUnchangedCount})
+                </h4>
+                <div className="mt-3 space-y-2">
+                  {priceSyncUnchangedProducts.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      All processed products required an update.
+                    </p>
+                  ) : (
+                    priceSyncUnchangedProducts.map((product) => (
+                      <div
+                        key={product.productId}
+                        className="rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
+                      >
+                        <div className="flex justify-between">
+                          <span className="font-medium">
+                            #{product.productId}
+                          </span>
+                          <span>{product.price || "—"}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+
+              {priceSyncFailureCount > 0 && (
+                <section>
+                  <h4 className="font-semibold text-gray-900">
+                    Failed Updates ({priceSyncFailureCount})
+                  </h4>
+                  <div className="mt-3 space-y-2">
+                    {priceSyncFailures.map((failure, index) => (
+                      <div
+                        key={`${failure.productId || "unknown"}-${index}`}
+                        className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+                      >
+                        <div className="flex justify-between">
+                          <span className="font-medium">
+                            #{failure.productId || "unknown"}
+                          </span>
+                          <span>Status: {failure.status}</span>
+                        </div>
+                        <p className="text-xs mt-1">{failure.message}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Press the Info Sync button to load the latest summary.
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

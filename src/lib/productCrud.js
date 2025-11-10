@@ -133,10 +133,10 @@ export const buildProductPayload = (product = {}) => {
     category_id: product.category_id
       ? toStringSafe(product.category_id)
       : "",
-    image: Array.isArray(product.image)
-      ? product.image.filter(Boolean)
-      : product.image
-      ? [product.image]
+    images: Array.isArray(product.images)
+      ? product.images.filter(Boolean)
+      : product.images
+      ? [product.images]
       : [],
   };
 

@@ -2,19 +2,15 @@
 const nextConfig = {
   images: {
     unoptimized: true, // Image optimization o'chirildi
-    domains: ["localhost"],
+    domains: ["localhost","q-bit.uz"],
     remotePatterns: [
       {
         protocol: "http",
         hostname: "localhost",
-        port: "3000",
-        pathname: "/uploads/**",
       },
       {
         protocol: "https",
         hostname: "q-bit.uz",
-        // port: "3000",
-        pathname: "/uploads/**",
       },
     ],
   },

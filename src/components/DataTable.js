@@ -291,7 +291,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
     }
 
     // Handle images
-    if (field === "image" && Array.isArray(value)) {
+    if ((field === "image" || field === "images") && Array.isArray(value)) {
       return (
         <div className="bg-black/10 flex space-x-1">
           {value.slice(0, 2).map((img, idx) => (
@@ -311,7 +311,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
       );
     }
 
-    if (field === "image" && typeof value === "string") {
+    if ((field === "image" || field === "images") && typeof value === "string") {
       return (
         <Image
           src={`${IMG_URL}${value}`}
@@ -377,6 +377,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
     const fieldNames = {
       name: t("name"),
       image: t("image"),
+      images: t("image"),
       description: t("description"),
       created_at: t("createdAt"),
       updated_at: t("updatedAt"),

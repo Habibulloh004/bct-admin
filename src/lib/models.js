@@ -29,7 +29,7 @@ export const MODELS = {
         required: true,
       },
       { key: "ads_title", label: "Advertisement Title", type: "multilingual" },
-      { key: "image", label: "Product Images", type: "file-multiple" },
+      { key: "images", label: "Product Images", type: "file-multiple" },
       {
         key: "description",
         label: "Description",

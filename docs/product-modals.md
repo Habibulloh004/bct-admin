@@ -32,7 +32,7 @@ products: {
   fields: [
     { key: "name", type: "multilingual", required: true },
     { key: "ads_title", type: "multilingual" },
-    { key: "image", type: "file-multiple" },
+    { key: "images", type: "file-multiple" },
     { key: "description", type: "multilingual-table", required: true },
     { key: "guarantee", type: "multilingual" },
     { key: "serial_number", type: "text" },
