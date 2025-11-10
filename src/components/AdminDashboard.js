@@ -195,7 +195,7 @@ export default function AdminDashboard() {
 
     const shouldProceed =
       typeof window === "undefined" ||
-      window.confirm("Sync product prices and view summary?");
+      window.confirm(t("priceSyncConfirm"));
 
     if (!shouldProceed) {
       return;
@@ -208,7 +208,7 @@ export default function AdminDashboard() {
     const token = getAuthToken?.();
 
     if (!token) {
-      setPriceSyncError("Missing admin token. Please re-login.");
+      setPriceSyncError(t("priceSyncMissingToken"));
       return;
     }
 
@@ -224,13 +224,13 @@ export default function AdminDashboard() {
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload?.error || "Failed to sync prices");
+        throw new Error(payload?.error || t("priceSyncGenericError"));
       }
 
       setPriceSyncResult(payload);
     } catch (error) {
       console.error("Price sync failed:", error);
-      setPriceSyncError(error.message || "Failed to sync prices");
+      setPriceSyncError(error.message || t("priceSyncGenericError"));
     } finally {
       setPriceSyncing(false);
     }
@@ -359,16 +359,18 @@ export default function AdminDashboard() {
                 onClick={handlePriceSync}
                 disabled={priceSyncing}
                 className="flex items-center space-x-2"
-                title="Sync product prices from Google Sheet"
+                title={t("priceSyncTooltip")}
               >
                 <FileSpreadsheet
                   className={`h-4 w-4 ${priceSyncing ? "animate-spin" : ""}`}
                 />
                 <span className="hidden sm:inline">
-                  {priceSyncing ? "Syncing..." : "Info Sync"}
+                  {priceSyncing
+                    ? t("priceSyncButtonLoading")
+                    : t("priceSyncButton")}
                 </span>
                 <span className="sm:hidden">
-                  {priceSyncing ? "..." : "Info"}
+                  {priceSyncing ? "..." : t("priceSyncButtonShort")}
                 </span>
               </Button>
 
@@ -442,18 +444,21 @@ export default function AdminDashboard() {
               >
                 <p className="font-semibold">
                   {priceSyncResult.success
-                    ? "Prices synced successfully"
-                    : "Prices synced with some issues"}
+                    ? t("priceSyncSuccess")
+                    : t("priceSyncPartial")}
                 </p>
                 <p className="text-sm mt-1">
-                  Updated {priceSyncUpdatedCount} product
-                  {priceSyncUpdatedCount === 1 ? "" : "s"},{" "}
-                  {priceSyncUnchangedCount} unchanged, and skipped{" "}
-                  {priceSyncSkippedCount}.
+                  {t("priceSyncSummary", {
+                    updated: priceSyncUpdatedCount,
+                    unchanged: priceSyncUnchangedCount,
+                    skipped: priceSyncSkippedCount,
+                  })}
                 </p>
                 {priceSyncFailureCount > 0 && (
                   <p className="text-sm mt-1">
-                    Failed updates: {priceSyncFailureCount}
+                    {t("priceSyncFailuresLabel", {
+                      count: priceSyncFailureCount,
+                    })}
                     {priceSyncFailurePreview && (
                       <>
                         {" "}
@@ -471,7 +476,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center space-x-2">
                   <AlertCircle className="h-5 w-5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium">Price sync failed</p>
+                    <p className="font-medium">{t("priceSyncErrorTitle")}</p>
                     <p className="text-sm">{priceSyncError}</p>
                   </div>
                 </div>
@@ -703,17 +708,19 @@ export default function AdminDashboard() {
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <FileSpreadsheet className="h-5 w-5" />
-              <span>Price Sync Summary</span>
+              <span>{t("priceSyncModalTitle")}</span>
             </DialogTitle>
           </DialogHeader>
           {priceSyncing ? (
             <div className="flex flex-col items-center space-y-4 py-6">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-              <p className="text-sm text-gray-600">Syncing data from Google Sheet...</p>
+              <p className="text-sm text-gray-600">
+                {t("priceSyncLoading")}
+              </p>
             </div>
           ) : priceSyncError ? (
             <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-              <p className="font-medium mb-1">Price sync failed</p>
+              <p className="font-medium mb-1">{t("priceSyncErrorTitle")}</p>
               <p>{priceSyncError}</p>
             </div>
           ) : priceSyncResult ? (
@@ -721,16 +728,20 @@ export default function AdminDashboard() {
               <section>
                 <div className="flex items-center justify-between">
                   <h4 className="font-semibold text-gray-900">
-                    Updated Products ({priceSyncUpdatedCount})
+                    {t("priceSyncUpdatedSection", {
+                      count: priceSyncUpdatedCount,
+                    })}
                   </h4>
                   <span className="text-sm text-gray-500">
-                    Skipped: {priceSyncSkippedCount}
+                    {t("priceSyncSkippedLabel", {
+                      count: priceSyncSkippedCount,
+                    })}
                   </span>
                 </div>
                 <div className="mt-3 space-y-2">
                   {priceSyncUpdatedProducts.length === 0 ? (
                     <p className="text-sm text-gray-500">
-                      No products changed during the last sync.
+                      {t("priceSyncNoChanges")}
                     </p>
                   ) : (
                     priceSyncUpdatedProducts.map((product) => (
@@ -754,12 +765,14 @@ export default function AdminDashboard() {
 
               <section>
                 <h4 className="font-semibold text-gray-900">
-                  Unchanged Products ({priceSyncUnchangedCount})
+                  {t("priceSyncUnchangedSection", {
+                    count: priceSyncUnchangedCount,
+                  })}
                 </h4>
                 <div className="mt-3 space-y-2">
                   {priceSyncUnchangedProducts.length === 0 ? (
                     <p className="text-sm text-gray-500">
-                      All processed products required an update.
+                      {t("priceSyncAllUpdated")}
                     </p>
                   ) : (
                     priceSyncUnchangedProducts.map((product) => (
@@ -782,7 +795,9 @@ export default function AdminDashboard() {
               {priceSyncFailureCount > 0 && (
                 <section>
                   <h4 className="font-semibold text-gray-900">
-                    Failed Updates ({priceSyncFailureCount})
+                    {t("priceSyncFailedSection", {
+                      count: priceSyncFailureCount,
+                    })}
                   </h4>
                   <div className="mt-3 space-y-2">
                     {priceSyncFailures.map((failure, index) => (
@@ -805,7 +820,7 @@ export default function AdminDashboard() {
             </div>
           ) : (
             <p className="text-sm text-gray-500">
-              Press the Info Sync button to load the latest summary.
+              {t("priceSyncModalPrompt")}
             </p>
           )}
         </DialogContent>

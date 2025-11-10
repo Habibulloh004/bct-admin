@@ -165,7 +165,32 @@ const translations = {
     formLanguage: "Form Language",
     currentlyEditing: "Currently editing in",
     select: "Select",
-    recommendedImageSize: "Recommended: 16:9 format, 800x450 px"
+    recommendedImageSize: "Recommended: 16:9 format, 800x450 px",
+
+    // Price Sync
+    priceSyncButton: "Info Sync",
+    priceSyncButtonShort: "Info",
+    priceSyncButtonLoading: "Syncing...",
+    priceSyncTooltip: "Sync product prices from Google Sheet",
+    priceSyncConfirm: "Sync product prices and view summary?",
+    priceSyncMissingToken: "Missing admin token. Please re-login.",
+    priceSyncGenericError: "Failed to sync prices",
+    priceSyncSuccess: "Prices synced successfully",
+    priceSyncPartial: "Prices synced with some issues",
+    priceSyncSummary:
+      "Updated {updated} product(s), {unchanged} unchanged, and skipped {skipped}.",
+    priceSyncFailuresLabel: "Failed updates: {count}",
+    priceSyncModalTitle: "Price Sync Summary",
+    priceSyncLoading: "Syncing data from Google Sheet...",
+    priceSyncErrorTitle: "Price sync failed",
+    priceSyncNoChanges: "No products changed during the last sync.",
+    priceSyncAllUpdated: "All processed products required an update.",
+    priceSyncUpdatedSection: "Updated Products ({count})",
+    priceSyncUnchangedSection: "Unchanged Products ({count})",
+    priceSyncFailedSection: "Failed Updates ({count})",
+    priceSyncSkippedLabel: "Skipped: {count}",
+    priceSyncModalPrompt:
+      "Press the Info Sync button to load the latest summary."
   },
 
   ru: {
@@ -328,7 +353,32 @@ const translations = {
     formLanguage: "Язык формы",
     currentlyEditing: "Редактирование на",
     select: "Выберите",
-    recommendedImageSize: "Рекомендуется: формат 16:9, 800x450 пикселей"
+    recommendedImageSize: "Рекомендуется: формат 16:9, 800x450 пикселей",
+
+    // Price Sync
+    priceSyncButton: "Синхронизация",
+    priceSyncButtonShort: "Синхро",
+    priceSyncButtonLoading: "Синхр...",
+    priceSyncTooltip: "Синхронизировать цены из Google Sheet",
+    priceSyncConfirm: "Синхронизировать цены и показать отчёт?",
+    priceSyncMissingToken: "Отсутствует токен администратора. Войдите снова.",
+    priceSyncGenericError: "Не удалось синхронизировать цены",
+    priceSyncSuccess: "Цены успешно синхронизированы",
+    priceSyncPartial: "Цены синхронизированы с некоторыми проблемами",
+    priceSyncSummary:
+      "Обновлено {updated}, без изменений {unchanged}, пропущено {skipped}.",
+    priceSyncFailuresLabel: "Неудачных обновлений: {count}",
+    priceSyncModalTitle: "Отчёт о синхронизации цен",
+    priceSyncLoading: "Синхронизация данных из Google Sheet...",
+    priceSyncErrorTitle: "Ошибка синхронизации цен",
+    priceSyncNoChanges: "Во время последней синхронизации изменений не найдено.",
+    priceSyncAllUpdated: "Все обработанные товары требовали обновления.",
+    priceSyncUpdatedSection: "Обновлённые товары ({count})",
+    priceSyncUnchangedSection: "Без изменений ({count})",
+    priceSyncFailedSection: "Неудачные обновления ({count})",
+    priceSyncSkippedLabel: "Пропущено: {count}",
+    priceSyncModalPrompt:
+      "Нажмите кнопку синхронизации, чтобы загрузить отчёт."
   },
 
   uz: {
@@ -491,7 +541,32 @@ const translations = {
     formLanguage: "Forma tili",
     currentlyEditing: "Hozir tahrirlash",
     select: "Tanlang",
-    recommendedImageSize: "Tavsiya etiladi: 16:9 format, 800x450 px"
+    recommendedImageSize: "Tavsiya etiladi: 16:9 format, 800x450 px",
+
+    // Price Sync
+    priceSyncButton: "Ma'lumotni sinxronlash",
+    priceSyncButtonShort: "Sinx",
+    priceSyncButtonLoading: "Sinx...",
+    priceSyncTooltip: "Google Sheet dan narxlarni sinxronlang",
+    priceSyncConfirm: "Narxlarni sinxronlab, hisobot ko'rsatilsinmi?",
+    priceSyncMissingToken: "Admin token topilmadi. Iltimos, qayta kiring.",
+    priceSyncGenericError: "Narxlarni sinxronlab bo'lmadi",
+    priceSyncSuccess: "Narxlar muvaffaqiyatli sinxronlandi",
+    priceSyncPartial: "Narxlar ayrim xatoliklar bilan sinxronlandi",
+    priceSyncSummary:
+      "Yangilandi {updated} ta, o'zgarmadi {unchanged} ta, o'tkazib yuborildi {skipped} ta.",
+    priceSyncFailuresLabel: "Muvaffaqiyatsiz yangilanishlar: {count}",
+    priceSyncModalTitle: "Narxlarni sinxronlash hisoboti",
+    priceSyncLoading: "Google Sheet dan ma'lumotlar sinxronlanmoqda...",
+    priceSyncErrorTitle: "Narxlarni sinxronlash xatosi",
+    priceSyncNoChanges: "Oxirgi sinxronlashda o'zgarishlar topilmadi.",
+    priceSyncAllUpdated: "Barcha qayta ishlangan mahsulotlar yangilanishi kerak edi.",
+    priceSyncUpdatedSection: "Yangilangan mahsulotlar ({count})",
+    priceSyncUnchangedSection: "O'zgarmagan mahsulotlar ({count})",
+    priceSyncFailedSection: "Muvaffaqiyatsiz yangilanishlar ({count})",
+    priceSyncSkippedLabel: "O'tkazib yuborildi: {count}",
+    priceSyncModalPrompt:
+      "Hisobotni ko'rish uchun sinxronlash tugmasini bosing."
   },
 };
 
