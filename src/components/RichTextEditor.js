@@ -38,6 +38,8 @@ export function MultilingualRichTextEditor({
   });
   const [mounted, setMounted] = useState(false);
   const editorRef = useRef(null);
+  const multilingualValueRef = useRef(multilingualValue);
+  const isInternalUpdate = useRef(false);
 
   const currentLang = getCurrentLanguage();
 
@@ -46,33 +48,44 @@ export function MultilingualRichTextEditor({
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    multilingualValueRef.current = multilingualValue;
+  }, [multilingualValue]);
+
   useLayoutEffect(() => {
+    if (!mounted) return;
     const parsed = MultilingualHelpers.parseMultilingual(value);
     setMultilingualValue(parsed);
+    multilingualValueRef.current = parsed;
 
-    if (mounted && editorRef.current) {
+    if (isInternalUpdate.current) {
+      isInternalUpdate.current = false;
+      return;
+    }
+
+    if (editorRef.current) {
       const content = parsed[currentFormLanguage] || "";
       editorRef.current.innerHTML = content;
     }
-  }, [value, currentFormLanguage, mounted]);
+  }, [value, mounted, currentFormLanguage]);
 
-  // Update editor content when language changes
   useLayoutEffect(() => {
-    if (mounted && editorRef.current) {
-      const content = multilingualValue[currentFormLanguage] || "";
-      editorRef.current.innerHTML = content;
-    }
-  }, [currentFormLanguage, multilingualValue, mounted]);
+    if (!mounted || !editorRef.current) return;
+    const content =
+      multilingualValueRef.current[currentFormLanguage] || "";
+    editorRef.current.innerHTML = content;
+  }, [currentFormLanguage, mounted]);
 
   const handleValueChange = () => {
     if (!editorRef.current) return;
-    
+    isInternalUpdate.current = true;
     const content = editorRef.current.innerHTML;
     const updated = {
       ...multilingualValue,
       [currentFormLanguage]: content,
     };
     setMultilingualValue(updated);
+    multilingualValueRef.current = updated;
 
     // Convert back to string format and call onChange
     const formattedValue = MultilingualHelpers.formatMultilingual(updated);

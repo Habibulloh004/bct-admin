@@ -154,7 +154,7 @@ export const useStore = create(
         try {
           const res = await fetch(API_CURRENCY + "/api/currency", {
             cache: "force-cache",
-            next: { revalidate: 6 * 60 * 60 },
+            next: { revalidate: 60 },
           });
           const rawRate = await res.json();
           const rate =
