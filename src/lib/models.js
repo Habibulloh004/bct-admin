@@ -28,7 +28,7 @@ export const MODELS = {
         type: "multilingual",
         required: true,
       },
-      { key: "ads_title", label: "Advertisement Title", type: "multilingual" },
+      { key: "ads_title", label: "Advertisement Title", type: "multilingual-textarea" },
       { key: "images", label: "Product Images", type: "file-multiple" },
       {
         key: "description",

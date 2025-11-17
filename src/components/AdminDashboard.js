@@ -88,8 +88,15 @@ export default function AdminDashboard() {
         fetchData(currentModel);
       }
     }
-    currencyGet(100)
-  }, [currentModel, fetchData, fetchSingletonData, currencyGet]);
+  }, [currentModel, fetchData, fetchSingletonData]);
+
+  useEffect(() => {
+    currencyGet(100);
+    const intervalId = setInterval(() => {
+      currencyGet(100);
+    }, 6 * 60 * 60 * 1000);
+    return () => clearInterval(intervalId);
+  }, [currencyGet]);
 
   // Get current model configuration and data
   const currentModelConfig = MODELS[currentModel];
@@ -125,6 +132,30 @@ export default function AdminDashboard() {
     if (!stringValue) return "—";
     return stringValue.startsWith("$") ? stringValue : `$${stringValue}`;
   };
+
+  const extractCurrencyField = (key) => {
+    if (currency && typeof currency === "object" && currency !== null) {
+      return currency[key] || 0;
+    }
+    if (typeof currency === "number") {
+      return currency;
+    }
+    return 0;
+  };
+
+  const formatCurrencyRate = (value) => {
+    const numericValue = Number(value);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      return "—";
+    }
+    return new Intl.NumberFormat("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(numericValue);
+  };
+
+  const officialCurrencyRate = extractCurrencyField("official");
+  const bctCurrencyRate = extractCurrencyField("bct");
 
   // Get translated model name
   const getModelName = (modelKey) => {
@@ -310,8 +341,19 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </nav>
-                <div>
-                  Курс доллара: {currency.toLocaleString()} UZS
+                <div className="text-sm text-gray-600 space-y-0.5">
+                  <p>
+                    <span className="text-gray-500">Курс USD CBU:</span>{" "}
+                    <span className="font-semibold text-gray-900">
+                      {formatCurrencyRate(officialCurrencyRate)} UZS
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-gray-500">Курс USD BCT:</span>{" "}
+                    <span className="font-semibold text-gray-900">
+                      {formatCurrencyRate(bctCurrencyRate)} UZS
+                    </span>
+                  </p>
                 </div>
                 {/* Main Title */}
                 <h1 className="text-2xl font-bold text-gray-900">

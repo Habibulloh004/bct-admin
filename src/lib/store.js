@@ -70,7 +70,12 @@ export const useStore = create(
       data: {},
       loading: false,
       error: null,
-      currency: 0,
+      currency: {
+        official: 0,
+        bct: 0,
+        roundedBct: 0,
+        lastUpdated: null
+      },
 
 
       // Current model state (persisted to survive refreshes)
@@ -147,17 +152,44 @@ export const useStore = create(
       },
       currencyGet: async (priceUsd = 100) => {
         try {
-          const res = await fetch(API_CURRENCY + "/api/currency"); // caching backendda
-          const rate = await res.json();
-          console.log({ rate })
-          if (!rate) return null;
+          const res = await fetch(API_CURRENCY + "/api/currency", {
+            cache: "force-cache",
+            next: { revalidate: 6 * 60 * 60 },
+          });
+          const rawRate = await res.json();
+          const rate =
+            typeof rawRate === 'number'
+              ? rawRate
+              : Number(rawRate?.rate ?? rawRate?.value);
+
+          if (!rate || Number.isNaN(rate)) {
+            throw new Error('Invalid currency response');
+          }
+
+          const markupMultiplier = 1.01;
           let total = priceUsd * rate;
-          total = total * 1.01;
+          total = total * markupMultiplier;
           total = Math.round(total / 1000) * 1000;
-          set({ currency: total / 100 })
+          const roundedBct = total / priceUsd;
+          const bctRate = Number((rate * markupMultiplier).toFixed(4));
+
+          const currencyPayload = {
+            official: rate,
+            bct: bctRate,
+            roundedBct,
+            lastUpdated: new Date().toISOString()
+          };
+
+          set({ currency: currencyPayload });
+          return currencyPayload;
         } catch (error) {
           console.error('Error fetching currency:', error);
-          return 0;
+          return {
+            official: 0,
+            bct: 0,
+            roundedBct: 0,
+            lastUpdated: null
+          };
         }
       },
 
