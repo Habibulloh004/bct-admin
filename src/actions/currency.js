@@ -1,14 +1,11 @@
 'use server';
 
-
 // Fetch currency rate on the server to avoid client-side CORS issues
 export async function fetchCurrencyRate(priceUsd = 100) {
-  const explicitEnv = process.env.NEXT_PUBLIC_API_CURRENCY || "http://localhost:3000"
-
-  const apiUrl = `${explicitEnv}/api/currency`;
+  const apiUrl =
+    process.env.NEXT_PUBLIC_API_CURRENCY || "http://localhost:5173/api/currency"
   const res = await fetch(apiUrl, {
-    cache: 'force-cache',
-    next: { revalidate: 300 },
+    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -23,7 +20,15 @@ export async function fetchCurrencyRate(priceUsd = 100) {
 
   const rawRate = await res.json();
   const rate =
-    typeof rawRate === 'number' ? rawRate : Number(rawRate?.rate ?? rawRate?.value);
+    typeof rawRate === 'number'
+      ? rawRate
+      : Number(
+        rawRate?.rate ??
+        rawRate?.value ??
+        rawRate?.UZS ??
+        rawRate?.conversion_rates?.UZS ??
+        rawRate?.rates?.UZS
+      );
 
   if (!rate || Number.isNaN(rate)) {
     throw new Error('Invalid currency response');
