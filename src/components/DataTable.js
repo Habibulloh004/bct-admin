@@ -68,7 +68,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
   const [copiedId, setCopiedId] = useState(null);
   const copyTimeoutRef = useRef(null);
 
-  const { deleteItem, data: storeData, fetchData } = useStore();
+  const { deleteItem, data: storeData, fetchData, currency } = useStore();
 
   // Use global language for UI elements only
   const { t, getAvailableLanguages } = useLanguage();
@@ -277,6 +277,41 @@ export default function DataTable({ model, data, onEdit, loading }) {
       return renderCopyableId(value ?? item?.id ?? item?._id);
     }
 
+    if (field === "price_usd") {
+      // Backend price arrives in USD; show it directly regardless of field presence
+      const priceValue = item.price ?? value;
+      if (!priceValue) {
+        return renderTruncated("-");
+      }
+      const normalized = normalizeCurrencyValue(priceValue);
+      if (!normalized) {
+        return renderTruncated("-");
+      }
+      const formattedPrice = formatPrice(Number(normalized), tableLanguage);
+      return renderTruncated(`$ ${formattedPrice}`);
+    }
+
+    if (field === "price_uzs") {
+      // Convert backend USD price to UZS using the current BCT rate
+      const priceValue = item.price ?? value;
+      if (!priceValue) {
+        return renderTruncated("-");
+      }
+      const normalized = normalizeCurrencyValue(priceValue);
+      if (!normalized) {
+        return renderTruncated("-");
+      }
+      const bctRate = currency?.bct || 0;
+      if (!bctRate) {
+        return renderTruncated("-");
+      }
+      const priceInUzsRaw = Number(normalized) * bctRate;
+      // Round to nearest thousand for display
+      const priceInUzs = Math.round(priceInUzsRaw / 1000) * 1000;
+      const formattedPriceUzs = formatPrice(priceInUzs, tableLanguage);
+      return renderTruncated(`${formattedPriceUzs} so'm`);
+    }
+
     if (!value) return renderTruncated("-");
 
     // Handle dates
@@ -321,15 +356,6 @@ export default function DataTable({ model, data, onEdit, loading }) {
           className="w-full h-12 object-contain  rounded p-2 bg-black/10"
         />
       );
-    }
-
-    if (field === "price") {
-      const normalized = normalizeCurrencyValue(value);
-      if (!normalized) {
-        return renderTruncated("-");
-      }
-      const formattedPrice = formatPrice(Number(normalized), tableLanguage);
-      return renderTruncated(`${formattedPrice} $`);
     }
 
     if (field === "category_id" && model === "products") {
@@ -385,6 +411,8 @@ export default function DataTable({ model, data, onEdit, loading }) {
       top_category_id: t("topCategory"),
       ads_title: t("advertisementTitle"),
       price: t("price") || "Price($)",
+      price_usd: "Price (USD)",
+      price_uzs: "Price (UZS)",
       discount: t("discount") || "Discount",
       guarantee: t("guarantee"),
       serial_number: t("serialNumber"),
