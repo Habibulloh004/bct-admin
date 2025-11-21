@@ -1,16 +1,14 @@
 'use server';
 
-const API_CURRENCY =
-  process.env.API_CURRENCY ||
-  process.env.NEXT_PUBLIC_API_CURRENCY ||
-  'http://localhost:3000';
 
 // Fetch currency rate on the server to avoid client-side CORS issues
 export async function fetchCurrencyRate(priceUsd = 100) {
-  const apiUrl = `${API_CURRENCY.replace(/\/$/, '')}/api/currency`;
+  const explicitEnv = process.env.NEXT_PUBLIC_API_CURRENCY || "http://localhost:3000"
+
+  const apiUrl = `${explicitEnv}/api/currency`;
   const res = await fetch(apiUrl, {
     cache: 'force-cache',
-    next: { revalidate: 60 },
+    next: { revalidate: 300 },
   });
 
   if (!res.ok) {
