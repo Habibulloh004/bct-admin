@@ -33,27 +33,31 @@ export const MODELS = {
       {
         key: "description",
         label: "Description",
-        type: "multilingual-table", // Changed to rich text
+        type: "multilingual-table",
         required: true,
       },
-      { key: "guarantee", label: "Guarantee", type: "multilingual" },
-      { key: "serial_number", label: "Serial Number", type: "text" },
+      { key: "guarantee", label: "Guarantee", type: "multilingual", },
+      {
+        key: "serial_number", label: "Serial Number", type: "text",
+        required: true,
+
+      },
+      {
+        key: "shtrix_number", label: "Barcode (Shtrix)", type: "text",
+        required: true,
+      },
       { key: "price", label: "Price($)", type: "text", required: true },
       { key: "discount", label: "Discount", type: "text" },
+      { key: "count", label: "Stock Count", type: "text", required: true },
+      { key: "NDC", label: "NDC", type: "text", required: true },
+      { key: "tax", label: "Tax", type: "text", required: true },
       {
         key: "category_id",
         label: "Category",
         type: "select",
         options: "categories",
-        required:true
+        required: true
       },
-      // {
-      //   key: "active",
-      //   label: "Active",
-      //   type: "select",
-      //   options: "boolean",
-      // },
-      // { key: "index", label: "Index", type: "number", default: 0 },
     ],
     displayFields: [
       "id",

@@ -13,11 +13,11 @@ const resolveDefaultBaseUrl = () => {
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL.replace(/\/$/, '')}/api`;
   }
-  const port = process.env.PORT || 3000;
-  return `http://localhost:${port}/api`;
+  // Fallback to port 9000 API server
+  return 'http://localhost:9000/api';
 };
 
-const DEFAULT_BASE_URL = resolveDefaultBaseUrl();
+const DEFAULT_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9000/api"
 
 const normalizePath = (path) => {
   if (!path) {
@@ -118,12 +118,12 @@ export async function apiRequest({
 
   const response = await fetch(urlWithParams, fetchOptions);
   const payload = await parseResponseBody(response).catch(() => null);
-
+  console.log({ response, payload, body })
   if (!response.ok) {
     const error = new Error(
       payload?.message ||
-        payload?.error ||
-        `Request to ${urlWithParams.pathname} failed with status ${response.status}`
+      payload?.error ||
+      `Request to ${urlWithParams.pathname} failed with status ${response.status}`
     );
     error.status = response.status;
     error.details = payload;

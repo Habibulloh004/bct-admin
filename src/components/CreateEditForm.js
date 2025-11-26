@@ -190,6 +190,27 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
         }
       });
 
+      // Convert numeric fields to proper types for the API
+      const numericFields = ["price", "discount", "NDC", "tax"];
+      numericFields.forEach((field) => {
+        if (submitData[field] !== undefined) {
+          const parsed = parseFloat(submitData[field]);
+          submitData[field] = isNaN(parsed) ? 0 : parsed;
+        }
+      });
+
+      // Convert integer fields
+      const intFields = ["count"];
+      intFields.forEach((field) => {
+        if (submitData[field] !== undefined) {
+          const parsed = parseInt(submitData[field], 10);
+          submitData[field] = isNaN(parsed) ? 0 : parsed;
+        }
+      });
+
+      // Debug: log what's being sent
+      console.log("Submitting data:", JSON.stringify(submitData, null, 2));
+
       if (isEditing) {
         await updateItem(model, item.id || item._id, submitData);
       } else {

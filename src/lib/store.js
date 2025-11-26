@@ -12,10 +12,8 @@ const resolveClientBaseUrl = () => {
   ) {
     return process.env.NEXT_PUBLIC_BASE_URL;
   }
-  if (typeof window !== 'undefined' && window.location) {
-    return `${window.location.origin.replace(/\/$/, '')}/api`;
-  }
-  return 'http://localhost:3000/api';
+  // Fallback to port 9000 API server instead of current origin
+  return 'http://localhost:9000/api';
 };
 const API_REVALIDATE = process.env.NEXT_PUBLIC_API_REVALIDATE || 'https://bct-shop.vercel.app/api/revalidate';
 export const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL || "http://localhost:3000"
