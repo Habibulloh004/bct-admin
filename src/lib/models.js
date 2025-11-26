@@ -29,28 +29,17 @@ export const MODELS = {
         required: true,
       },
       { key: "ads_title", label: "Advertisement Title", type: "multilingual-rich-text" },
-      { key: "images", label: "Product Images", type: "file-multiple" },
+      { key: "images", label: "Product Images", type: "file-multiple", required: true },
       {
         key: "description",
         label: "Description",
-        type: "multilingual-table",
+        type: "multilingual-table", // Changed to rich text
         required: true,
       },
-      { key: "guarantee", label: "Guarantee", type: "multilingual", },
-      {
-        key: "serial_number", label: "Serial Number", type: "text",
-        required: true,
-
-      },
-      {
-        key: "shtrix_number", label: "Barcode (Shtrix)", type: "text",
-        required: true,
-      },
+      { key: "guarantee", label: "Guarantee", type: "multilingual" },
+      { key: "serial_number", label: "Serial Number", type: "text" },
       { key: "price", label: "Price($)", type: "text", required: true },
       { key: "discount", label: "Discount", type: "text" },
-      { key: "count", label: "Stock Count", type: "text", required: true },
-      { key: "NDC", label: "NDC", type: "text", required: true },
-      { key: "tax", label: "Tax", type: "text", required: true },
       {
         key: "category_id",
         label: "Category",
@@ -58,6 +47,13 @@ export const MODELS = {
         options: "categories",
         required: true
       },
+      // {
+      //   key: "active",
+      //   label: "Active",
+      //   type: "select",
+      //   options: "boolean",
+      // },
+      // { key: "index", label: "Index", type: "number", default: 0 },
     ],
     displayFields: [
       "id",
