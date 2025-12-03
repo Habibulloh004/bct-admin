@@ -88,25 +88,6 @@ const resolveServiceAccountCredentials = () => {
   return buildFromDiscreteEnv() || buildFromInlineEnv();
 };
 
-export const columnLetterToIndex = (column = "") => {
-  if (!column) {
-    throw new Error("Column letter must be provided");
-  }
-
-  const letters = column.toUpperCase().trim();
-  let index = 0;
-
-  for (let i = 0; i < letters.length; i += 1) {
-    const charCode = letters.charCodeAt(i);
-    if (charCode < 65 || charCode > 90) {
-      throw new Error(`Invalid column letter: ${column}`);
-    }
-    index = index * 26 + (charCode - 64);
-  }
-
-  return index - 1;
-};
-
 export const fetchSheetValues = async ({
   spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID || DEFAULT_SPREADSHEET_ID,
   range = process.env.GOOGLE_SHEETS_RANGE || DEFAULT_RANGE_NAME,

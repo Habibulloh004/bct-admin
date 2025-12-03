@@ -78,6 +78,7 @@ export const useStore = create(
 
       // Current model state (persisted to survive refreshes)
       currentModel: 'top-categories',
+      priceSyncMapping: null,
 
       // Initialize auth from localStorage
       initAuth: () => {
@@ -219,6 +220,17 @@ export const useStore = create(
       // Set current model (this will be persisted)
       setCurrentModel: (model) => {
         set({ currentModel: model });
+      },
+
+      setPriceSyncMapping: (mapping) => {
+        const nextMapping =
+          mapping && typeof mapping === "object"
+            ? {
+                productIdColumn: mapping.productIdColumn ?? null,
+                priceColumn: mapping.priceColumn ?? null,
+              }
+            : null;
+        set({ priceSyncMapping: nextMapping });
       },
 
       // Get correct API route for model
@@ -577,7 +589,8 @@ export const useStore = create(
     {
       name: 'admin-store', // unique name for localStorage key
       partialize: (state) => ({
-        currentModel: state.currentModel // only persist currentModel
+        currentModel: state.currentModel,
+        priceSyncMapping: state.priceSyncMapping,
       }),
     }
   )

@@ -1,22 +1,5 @@
 'use server';
 
-const resolveDefaultBaseUrl = () => {
-  if (process.env.API_BASE_URL && process.env.API_BASE_URL.trim() !== '') {
-    return process.env.API_BASE_URL;
-  }
-  if (
-    process.env.NEXT_PUBLIC_BASE_URL &&
-    process.env.NEXT_PUBLIC_BASE_URL.trim() !== ''
-  ) {
-    return process.env.NEXT_PUBLIC_BASE_URL;
-  }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL.replace(/\/$/, '')}/api`;
-  }
-  // Fallback to port 9000 API server
-  return 'http://localhost:9000/api';
-};
-
 const DEFAULT_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:9000/api"
 
 const normalizePath = (path) => {

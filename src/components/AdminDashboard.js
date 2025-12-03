@@ -24,6 +24,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -32,6 +34,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Plus,
   LogOut,
@@ -45,7 +49,13 @@ import {
   ChevronRight,
   FileSpreadsheet,
 } from "lucide-react";
+import { parseColumnSpecifier } from "@/lib/columnUtils";
 import Image from "next/image";
+
+const PRICE_SYNC_DEFAULT_PRODUCT_COLUMN =
+  process.env.NEXT_PUBLIC_GOOGLE_SHEET_PRODUCT_ID_COLUMN || "AE";
+const PRICE_SYNC_DEFAULT_PRICE_COLUMN =
+  process.env.NEXT_PUBLIC_GOOGLE_SHEET_PRICE_COLUMN || "AU";
 
 export default function AdminDashboard() {
   // State management
@@ -59,6 +69,10 @@ export default function AdminDashboard() {
   const [priceSyncResult, setPriceSyncResult] = useState(null);
   const [priceSyncError, setPriceSyncError] = useState(null);
   const [isPriceSyncModalOpen, setIsPriceSyncModalOpen] = useState(false);
+  const [isMappingModalOpen, setIsMappingModalOpen] = useState(false);
+  const [productColumnInput, setProductColumnInput] = useState("");
+  const [priceColumnInput, setPriceColumnInput] = useState("");
+  const [mappingError, setMappingError] = useState("");
 
   // Language and store hooks
   const { t, currentLanguage, changeLanguage, getAvailableLanguages } =
@@ -75,6 +89,8 @@ export default function AdminDashboard() {
     clearError,
     currencyGet,
     currency,
+    priceSyncMapping,
+    setPriceSyncMapping,
     getAuthToken
   } = useStore();
 
@@ -97,6 +113,18 @@ export default function AdminDashboard() {
     }, 6 * 60 * 60 * 1000);
     return () => clearInterval(intervalId);
   }, [currencyGet]);
+
+  useEffect(() => {
+    if (!isMappingModalOpen) return;
+    const storedMapping = priceSyncMapping || {};
+    setProductColumnInput(
+      storedMapping.productIdColumn || PRICE_SYNC_DEFAULT_PRODUCT_COLUMN
+    );
+    setPriceColumnInput(
+      storedMapping.priceColumn || PRICE_SYNC_DEFAULT_PRICE_COLUMN
+    );
+    setMappingError("");
+  }, [isMappingModalOpen, priceSyncMapping]);
 
   // Get current model configuration and data
   const currentModelConfig = MODELS[currentModel];
@@ -229,36 +257,67 @@ export default function AdminDashboard() {
     }
   };
 
-  const handlePriceSync = async () => {
+  const handlePriceSync = () => {
     if (priceSyncing) return;
+    setIsMappingModalOpen(true);
+  };
 
-    const shouldProceed =
-      typeof window === "undefined" ||
-      window.confirm(t("priceSyncConfirm"));
+  const handleConfirmPriceSync = async () => {
+    const productSpec = productColumnInput?.trim();
+    const priceSpec = priceColumnInput?.trim();
 
-    if (!shouldProceed) {
+    const productIndex = parseColumnSpecifier(productSpec);
+    if (productIndex === null) {
+      setMappingError(
+        t("priceSyncColumnInvalid", {
+          field: t("priceSyncProductIdColumnLabel"),
+        })
+      );
       return;
     }
 
+    const priceIndex = parseColumnSpecifier(priceSpec);
+    if (priceIndex === null) {
+      setMappingError(
+        t("priceSyncColumnInvalid", {
+          field: t("priceSyncPriceColumnLabel"),
+        })
+      );
+      return;
+    }
+
+    setMappingError("");
+    setIsMappingModalOpen(false);
     setPriceSyncError(null);
     setPriceSyncResult(null);
     setIsPriceSyncModalOpen(true);
+    setPriceSyncing(true);
+    setPriceSyncMapping({
+      productIdColumn: productSpec,
+      priceColumn: priceSpec,
+    });
 
     const token = getAuthToken?.();
 
     if (!token) {
       setPriceSyncError(t("priceSyncMissingToken"));
+      setPriceSyncing(false);
       return;
     }
-
-    setPriceSyncing(true);
 
     try {
       const response = await fetch("/api/products/sync-prices", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          columnMapping: {
+            productIdColumn: productSpec,
+            priceColumn: priceSpec,
+          },
+        }),
       });
       const payload = await response.json();
 
@@ -743,8 +802,69 @@ export default function AdminDashboard() {
             )}
           </div>
         </main>
-      </div>
     </div>
+  </div>
+
+      <Dialog
+        open={isMappingModalOpen}
+        onOpenChange={(open) => setIsMappingModalOpen(open)}
+      >
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <FileSpreadsheet className="h-5 w-5" />
+              <span>{t("priceSyncColumnMappingTitle")}</span>
+            </DialogTitle>
+            <DialogDescription>
+              {t("priceSyncColumnMappingDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="product-column">
+                {t("priceSyncProductIdColumnLabel")}
+              </Label>
+              <Input
+                id="product-column"
+                value={productColumnInput}
+                onChange={(event) => setProductColumnInput(event.target.value)}
+                placeholder={PRICE_SYNC_DEFAULT_PRODUCT_COLUMN}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="price-column">
+                {t("priceSyncPriceColumnLabel")}
+              </Label>
+              <Input
+                id="price-column"
+                value={priceColumnInput}
+                onChange={(event) => setPriceColumnInput(event.target.value)}
+                placeholder={PRICE_SYNC_DEFAULT_PRICE_COLUMN}
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              {t("priceSyncColumnHint")}
+            </p>
+            {mappingError && (
+              <p className="text-sm text-red-600">{mappingError}</p>
+            )}
+          </div>
+          <DialogFooter className="pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsMappingModalOpen(false);
+                setMappingError("");
+              }}
+            >
+              {t("cancel")}
+            </Button>
+            <Button onClick={handleConfirmPriceSync} disabled={priceSyncing}>
+              {t("priceSyncButton")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={isPriceSyncModalOpen}

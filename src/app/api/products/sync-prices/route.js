@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { apiRequest } from "@/actions/api";
+import { fetchSheetValues } from "@/lib/googleSheets";
 import {
   columnLetterToIndex,
-  fetchSheetValues,
-} from "@/lib/googleSheets";
+  parseColumnSpecifier,
+} from "@/lib/columnUtils";
 
-const PRODUCT_ID_COLUMN =
+const DEFAULT_PRODUCT_ID_COLUMN =
   process.env.GOOGLE_SHEET_PRODUCT_ID_COLUMN || "AE";
-const PRODUCT_PRICE_COLUMN =
+const DEFAULT_PRODUCT_PRICE_COLUMN =
   process.env.GOOGLE_SHEET_PRICE_COLUMN || "AU";
 const API_REVALIDATE =
   process.env.NEXT_PUBLIC_API_REVALIDATE ||
@@ -26,8 +27,6 @@ const resolveColumnIndex = (column) => {
   }
 };
 
-const PRODUCT_ID_INDEX = resolveColumnIndex(PRODUCT_ID_COLUMN);
-const PRODUCT_PRICE_INDEX = resolveColumnIndex(PRODUCT_PRICE_COLUMN);
 const TARGET_IDS_INDEX = TARGET_IDS_COLUMN
   ? resolveColumnIndex(TARGET_IDS_COLUMN)
   : null;
@@ -106,10 +105,34 @@ const collectTargetProductIds = (rows) => {
   return targets.size ? targets : null;
 };
 
-const determineHeaderRowIndex = (rows) => {
-  if (!Array.isArray(rows)) return -1;
+const resolveColumnIndexFromSpecifier = (value, fallback, label) => {
+  const spec = value ?? fallback;
+  const parsedIndex = parseColumnSpecifier(spec);
+  if (parsedIndex === null) {
+    throw new Error(
+      `Invalid ${label} column "${spec}". Use a letter (A-Z) or zero-based index.`
+    );
+  }
+  return parsedIndex;
+};
+
+const parseColumnMappingFromRequest = async (request) => {
+  try {
+    const body = (await request.json()) ?? {};
+    const mapping = body?.columnMapping ?? {};
+    return {
+      productIdColumn: mapping.productIdColumn,
+      priceColumn: mapping.priceColumn,
+    };
+  } catch {
+    return {};
+  }
+};
+
+const determineHeaderRowIndex = (rows, productIdIndex) => {
+  if (!Array.isArray(rows) || productIdIndex === undefined) return -1;
   return rows.findIndex((row = []) => {
-    const value = row[PRODUCT_ID_INDEX];
+    const value = row[productIdIndex];
     return (
       typeof value === "string" &&
       value.trim().toLowerCase() === "key"
@@ -135,6 +158,29 @@ export async function POST(request) {
       );
     }
 
+    const columnMapping = await parseColumnMappingFromRequest(request);
+    let productIdIndex;
+    let productPriceIndex;
+
+    try {
+      productIdIndex = resolveColumnIndexFromSpecifier(
+        columnMapping.productIdColumn,
+        DEFAULT_PRODUCT_ID_COLUMN,
+        "product ID"
+      );
+      productPriceIndex = resolveColumnIndexFromSpecifier(
+        columnMapping.priceColumn,
+        DEFAULT_PRODUCT_PRICE_COLUMN,
+        "price"
+      );
+    } catch (columnError) {
+      console.error("Column mapping error:", columnError);
+      return NextResponse.json(
+        { success: false, error: columnError.message },
+        { status: 400 }
+      );
+    }
+
     const sheetValues = await fetchSheetValues();
 
     if (!sheetValues.length) {
@@ -145,7 +191,10 @@ export async function POST(request) {
     }
 
     const targetProductIds = collectTargetProductIds(sheetValues);
-    const headerRowIndex = determineHeaderRowIndex(sheetValues);
+    const headerRowIndex = determineHeaderRowIndex(
+      sheetValues,
+      productIdIndex
+    );
     const dataRows =
       headerRowIndex >= 0
         ? sheetValues.slice(headerRowIndex + 1)
@@ -158,8 +207,8 @@ export async function POST(request) {
     const failures = [];
 
     for (const row of dataRows) {
-      const productIdRaw = row?.[PRODUCT_ID_INDEX];
-      const priceRaw = row?.[PRODUCT_PRICE_INDEX];
+      const productIdRaw = row?.[productIdIndex];
+      const priceRaw = row?.[productPriceIndex];
       const productId = normalizeProductIdValue(productIdRaw);
       const price = normalizePriceValue(priceRaw);
 

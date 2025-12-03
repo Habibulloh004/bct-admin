@@ -190,7 +190,15 @@ const translations = {
     priceSyncFailedSection: "Failed Updates ({count})",
     priceSyncSkippedLabel: "Skipped: {count}",
     priceSyncModalPrompt:
-      "Press the Info Sync button to load the latest summary."
+      "Press the Info Sync button to load the latest summary.",
+    priceSyncColumnMappingTitle: "Price column mapping",
+    priceSyncColumnMappingDescription:
+      "Select the Google Sheet columns that contain product IDs and prices.",
+    priceSyncProductIdColumnLabel: "Product ID column",
+    priceSyncPriceColumnLabel: "Price column",
+    priceSyncColumnHint:
+      "Letters (A, B, ...) or zero-based index (A = 0) are accepted.",
+    priceSyncColumnInvalid: "Provide a valid column for {field}."
   },
 
   ru: {
@@ -378,7 +386,15 @@ const translations = {
     priceSyncFailedSection: "Неудачные обновления ({count})",
     priceSyncSkippedLabel: "Пропущено: {count}",
     priceSyncModalPrompt:
-      "Нажмите кнопку синхронизации, чтобы загрузить отчёт."
+      "Нажмите кнопку синхронизации, чтобы загрузить отчёт.",
+    priceSyncColumnMappingTitle: "Настройка колонок",
+    priceSyncColumnMappingDescription:
+      "Выберите столбцы Google Sheet для ID товаров и цен.",
+    priceSyncProductIdColumnLabel: "Колонка с ID продукта",
+    priceSyncPriceColumnLabel: "Колонка с ценой",
+    priceSyncColumnHint:
+      "Можно использовать буквы (A, B, ...) или индекс с нулевой позиции (A = 0).",
+    priceSyncColumnInvalid: "Укажите корректную колонку для {field}."
   },
 
   uz: {
@@ -566,7 +582,15 @@ const translations = {
     priceSyncFailedSection: "Muvaffaqiyatsiz yangilanishlar ({count})",
     priceSyncSkippedLabel: "O'tkazib yuborildi: {count}",
     priceSyncModalPrompt:
-      "Hisobotni ko'rish uchun sinxronlash tugmasini bosing."
+      "Hisobotni ko'rish uchun sinxronlash tugmasini bosing.",
+    priceSyncColumnMappingTitle: "Ustunlarni sozlash",
+    priceSyncColumnMappingDescription:
+      "Google Sheet dan mahsulot ID va narx ustunlarini tanlang.",
+    priceSyncProductIdColumnLabel: "Mahsulot ID ustuni",
+    priceSyncPriceColumnLabel: "Narx ustuni",
+    priceSyncColumnHint:
+      "Harflar (A, B, ...) yoki nolga asoslangan indekslar (A = 0) qabul qilinadi.",
+    priceSyncColumnInvalid: "{field} uchun to'g'ri ustunni kiriting."
   },
 };
 
