@@ -97,9 +97,9 @@ export function FormLanguageSelector({ className = "" }) {
 
   return (
     <div
-      className={`flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6 ${className}`}
+      className={`mb-6 flex flex-col gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between ${className}`}
     >
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center justify-between gap-3 sm:justify-end">
         <Globe className="h-5 w-5 text-blue-600" />
         <div>
           <h3 className="text-sm font-semibold text-blue-900">
@@ -129,13 +129,13 @@ export function FormLanguageSelector({ className = "" }) {
         </div>
 
         {/* Language Controls */}
-        <div className="flex items-center space-x-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handlePrevious}
-            className="h-8 w-8 p-0 border-blue-300 hover:bg-blue-100"
+            className="h-8 w-8 shrink-0 border-blue-300 p-0 hover:bg-blue-100"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -144,7 +144,7 @@ export function FormLanguageSelector({ className = "" }) {
             value={currentFormLanguage}
             onValueChange={setCurrentFormLanguage}
           >
-            <SelectTrigger className="w-40 h-8 border-blue-300">
+            <SelectTrigger className="h-8 min-w-0 flex-1 border-blue-300 sm:w-40 sm:flex-none">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -164,7 +164,7 @@ export function FormLanguageSelector({ className = "" }) {
             variant="outline"
             size="sm"
             onClick={handleNext}
-            className="h-8 w-8 p-0 border-blue-300 hover:bg-blue-100"
+            className="h-8 w-8 shrink-0 border-blue-300 p-0 hover:bg-blue-100"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

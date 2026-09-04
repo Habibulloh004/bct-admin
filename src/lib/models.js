@@ -182,7 +182,13 @@ export const MODELS = {
     name: "Blog",
     icon: "Newspaper",
     fields: [
-      { key: "image", label: "Cover Image", type: "file", required: true },
+      {
+        key: "image",
+        label: "Cover Image",
+        type: "multilingual-file",
+        required: true,
+        requireAllLanguages: true,
+      },
       {
         key: "title",
         label: "Title",

@@ -138,6 +138,7 @@ const translations = {
 
     // File upload
     clickToUpload: "Click to upload or drag and drop",
+    replaceImage: "Replace image",
     clickToUploadMultiple: "Click to upload multiple images",
 
     // Language display
@@ -338,6 +339,7 @@ const translations = {
 
     // File upload
     clickToUpload: "Нажмите для загрузки или перетащите",
+    replaceImage: "Заменить изображение",
     clickToUploadMultiple: "Нажмите для загрузки нескольких изображений",
 
     // Language display
@@ -538,6 +540,7 @@ const translations = {
 
     // File upload
     clickToUpload: "Yuklash uchun bosing yoki sudrab tashlang",
+    replaceImage: "Rasmni almashtirish",
     clickToUploadMultiple: "Bir nechta rasmni yuklash uchun bosing",
 
     // Language display

@@ -7,6 +7,7 @@ import {
   FormLanguageProvider,
   FormLanguageSelector,
   MultilingualInput,
+  useFormLanguage,
 } from "@/components/MultilingualInput";
 import { MultilingualRichTextEditor } from "@/components/RichTextEditor";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -25,6 +26,35 @@ import { Upload, X, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { getTranslatedValue } from "@/lib/utils";
 import MultilingualTableInput from "./MultilingualTableInput";
+
+const FORM_LANGUAGES = ["en", "ru", "uz"];
+
+function parseMultilingualFileValue(value) {
+  const normalizedValue = typeof value === "string" ? value.trim() : "";
+
+  // Existing blog records used one shared image. Replicate it while editing so
+  // they remain valid until an editor chooses language-specific replacements.
+  if (normalizedValue && !normalizedValue.includes("***")) {
+    return FORM_LANGUAGES.reduce((images, language) => {
+      images[language] = normalizedValue;
+      return images;
+    }, {});
+  }
+
+  return MultilingualHelpers.parseMultilingual(normalizedValue);
+}
+
+function normalizeMultilingualFileValue(value) {
+  return MultilingualHelpers.formatMultilingual(
+    parseMultilingualFileValue(value)
+  );
+}
+
+function resolveAdminImageUrl(value) {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${IMG_URL.replace(/\/$/, "")}/${value.replace(/^\//, "")}`;
+}
 
 export default function CreateEditForm({
   model,
@@ -57,6 +87,10 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
             typeof value === "object"
               ? value?.id?.toString() || value?._id?.toString() || ""
               : value?.toString() || "";
+        } else if (field.type === "multilingual-file") {
+          initialData[field.key] = normalizeMultilingualFileValue(
+            item[field.key]
+          );
         } else {
           initialData[field.key] = item[field.key] || "";
         }
@@ -72,6 +106,7 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
   const [errors, setErrors] = useState({});
 
   const { t, currentLanguage } = useLanguage();
+  const { currentFormLanguage, getCurrentLanguage } = useFormLanguage();
   const {
     createItem,
     updateItem,
@@ -130,13 +165,28 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
           ? [...currentFiles, result.url]
           : [result.url];
         handleInputChange(field.key, newFiles);
+      } else if (field.type === "multilingual-file") {
+        const images = parseMultilingualFileValue(formData[field.key]);
+        handleInputChange(
+          field.key,
+          MultilingualHelpers.formatMultilingual({
+            ...images,
+            [currentFormLanguage]: result.url,
+          })
+        );
       } else {
         handleInputChange(field.key, result.url);
       }
 
       setUploadedFiles((prev) => ({
         ...prev,
-        [field.key]: result,
+        [field.key]:
+          field.type === "multilingual-file"
+            ? {
+                ...(prev[field.key] || {}),
+                [currentFormLanguage]: result,
+              }
+            : result,
       }));
     } catch (error) {
       console.error("File upload failed:", error);
@@ -148,6 +198,22 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       const currentFiles = formData[field.key] || [];
       const newFiles = currentFiles.filter((_, i) => i !== index);
       handleInputChange(field.key, newFiles);
+    } else if (field.type === "multilingual-file") {
+      const images = parseMultilingualFileValue(formData[field.key]);
+      handleInputChange(
+        field.key,
+        MultilingualHelpers.formatMultilingual({
+          ...images,
+          [currentFormLanguage]: "",
+        })
+      );
+      setUploadedFiles((prev) => ({
+        ...prev,
+        [field.key]: {
+          ...(prev[field.key] || {}),
+          [currentFormLanguage]: null,
+        },
+      }));
     } else {
       handleInputChange(field.key, "");
       setUploadedFiles((prev) => ({
@@ -511,6 +577,107 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
             )}
           </div>
         );
+
+      case "multilingual-file": {
+        const localizedImages = parseMultilingualFileValue(value);
+        const currentImage = localizedImages[currentFormLanguage] || "";
+        const currentFormLanguageInfo = getCurrentLanguage();
+        const completedImages = FORM_LANGUAGES.filter(
+          (language) => localizedImages[language]?.trim()
+        ).length;
+        const inputId = `${field.key}-${currentFormLanguage}`;
+
+        return (
+          <div key={field.key} className="col-span-2 space-y-3">
+            <Label
+              htmlFor={inputId}
+              className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <span className="flex flex-wrap items-center gap-2">
+                <span>
+                  {getFieldLabel(field)}{" "}
+                  {field.required && <span className="text-red-500">*</span>}
+                </span>
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                  {currentFormLanguageInfo.flag}{" "}
+                  {currentFormLanguageInfo.nativeName}
+                </span>
+              </span>
+              <span className="text-xs font-medium text-gray-500">
+                {completedImages}/3 {t("completed")}
+              </span>
+            </Label>
+
+            {currentImage && (
+              <div className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-center">
+                <Image
+                  src={resolveAdminImageUrl(currentImage)}
+                  alt={`${getFieldLabel(field)} — ${currentFormLanguageInfo.nativeName}`}
+                  width={160}
+                  height={90}
+                  className="aspect-video w-full rounded-lg object-cover sm:w-40"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-gray-700">
+                    {currentImage.split("/").pop()}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {currentFormLanguageInfo.nativeName}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeFile(field)}
+                  className="self-end text-gray-500 hover:text-red-600 sm:self-auto"
+                  aria-label={`Remove ${currentFormLanguageInfo.nativeName} image`}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
+            <div
+              className={`rounded-xl border-2 border-dashed p-5 text-center transition-colors hover:border-blue-400 hover:bg-blue-50/40 ${
+                hasError ? "border-red-400" : "border-gray-300"
+              }`}
+            >
+              <input
+                key={inputId}
+                type="file"
+                id={inputId}
+                accept="image/*"
+                onChange={(event) =>
+                  event.target.files.length > 0 &&
+                  handleFileUpload(field, event.target.files)
+                }
+                className="hidden"
+              />
+              <label htmlFor={inputId} className="block cursor-pointer">
+                <Upload className="mx-auto mb-2 h-7 w-7 text-blue-500" />
+                <p className="text-sm font-medium text-gray-700">
+                  {currentImage ? t("replaceImage") : t("clickToUpload")}
+                </p>
+                <p className="mt-1 text-xs text-gray-500">
+                  {currentFormLanguageInfo.nativeName}
+                </p>
+              </label>
+            </div>
+
+            <p className="text-xs text-gray-500">
+              {t("recommendedImageSize") ||
+                "Tavsiya etiladi: 16:9 format, 800x450 px"}
+            </p>
+            {hasError && (
+              <p className="flex items-center text-sm text-red-500">
+                <AlertCircle className="mr-1 h-4 w-4" />
+                {hasError}
+              </p>
+            )}
+          </div>
+        );
+      }
 
       case "select":
         const options = getSelectOptions(field);

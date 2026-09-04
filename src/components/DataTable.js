@@ -320,12 +320,6 @@ export default function DataTable({ model, data, onEdit, loading }) {
       return renderTruncated(new Date(value).toLocaleDateString());
     }
 
-    // Handle multilingual fields (uses table language instead of global language)
-    if (typeof value === "string" && value.includes("***")) {
-      const translatedValue = getTranslatedValue(value, tableLanguage) || "-";
-      return renderTruncated(translatedValue);
-    }
-
     // Handle images
     if ((field === "image" || field === "images") && Array.isArray(value)) {
       return (
@@ -348,15 +342,24 @@ export default function DataTable({ model, data, onEdit, loading }) {
     }
 
     if ((field === "image" || field === "images") && typeof value === "string") {
+      const imageValue = value.includes("***")
+        ? getTranslatedValue(value, tableLanguage)
+        : value;
       return (
         <Image
-          src={`${IMG_URL}${value}`}
+          src={`${IMG_URL}${imageValue}`}
           alt="Preview"
           width={32}
           height={32}
           className="w-full h-12 object-contain  rounded p-2 bg-black/10"
         />
       );
+    }
+
+    // Handle multilingual fields (uses table language instead of global language)
+    if (typeof value === "string" && value.includes("***")) {
+      const translatedValue = getTranslatedValue(value, tableLanguage) || "-";
+      return renderTruncated(translatedValue);
     }
 
     if (field === "category_id" && model === "products") {
