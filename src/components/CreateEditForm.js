@@ -248,7 +248,7 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       ) {
         newErrors[field.key] = t("allLanguagesRequired");
       } else if (field.required && !v) {
-        newErrors[field.key] = `${field.label} ${t("required")}`;
+        newErrors[field.key] = `${getFieldLabel(field)} ${t("required")}`;
       }
       // HEX tekshiruv faqat select-color turlari uchun
       if (field.type === "select-color" && v) {

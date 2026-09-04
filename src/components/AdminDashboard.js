@@ -50,6 +50,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { parseColumnSpecifier } from "@/lib/columnUtils";
+import { getModelLabel } from "@/lib/modelLabels";
 import Image from "next/image";
 
 const PRICE_SYNC_DEFAULT_PRODUCT_COLUMN =
@@ -187,26 +188,16 @@ export default function AdminDashboard() {
 
   // Get translated model name
   const getModelName = (modelKey) => {
-    const modelTranslations = {
-      "top-categories": t("topCategories"),
-      categories: t("categories"),
-      products: t("products"),
-      about: t("about"),
-      contacts: t("contacts"),
-      news: t("news"),
-      blogs: t("blogs"),
-      partners: t("partners"),
-      certificates: t("certificates"),
-      licenses: t("licenses"),
-      "vendors-about": t("vendorsAbout"),
-      "official-partner": t("officialPartner"),
-      experiments: t("experiments"),
-      "company-stats": t("companyStats"),
-      discount: t("discount"),
-    };
-    return (
-      modelTranslations[modelKey] || currentModelConfig?.name || t("dashboard")
-    );
+    return getModelLabel(modelKey, t, {
+      fallback: currentModelConfig?.name || t("dashboard"),
+    });
+  };
+
+  const getSingularModelName = (modelKey) => {
+    return getModelLabel(modelKey, t, {
+      singular: true,
+      fallback: currentModelConfig?.name || t("dashboard"),
+    });
   };
 
   // Get breadcrumb path
@@ -403,13 +394,13 @@ export default function AdminDashboard() {
                 </nav>
                 <div className="text-sm text-gray-600 space-y-0.5">
                   <p>
-                    <span className="text-gray-500">Курс USD CBU:</span>{" "}
+                    <span className="text-gray-500">{t("officialUsdRate")}:</span>{" "}
                     <span className="font-semibold text-gray-900">
                       {formatCurrencyRate(officialCurrencyRate)} UZS
                     </span>
                   </p>
                   <p>
-                    <span className="text-gray-500">Курс USD BCT:</span>{" "}
+                    <span className="text-gray-500">{t("bctUsdRate")}:</span>{" "}
                     <span className="font-semibold text-gray-900">
                       {formatCurrencyRate(bctCurrencyRate)} UZS
                     </span>
@@ -420,13 +411,12 @@ export default function AdminDashboard() {
                   {getModelName(currentModel)}
                 </h1>
                 <p className="text-sm text-gray-500">
-                  {isSingleton
-                    ? `${t("manageData")} ${getModelName(
-                      currentModel
-                    ).toLowerCase()} ${t("information")}`
-                    : `${t("manageAllRecords")} ${getModelName(
-                      currentModel
-                    ).toLowerCase()} ${t("records")}`}
+                  {t(
+                    isSingleton
+                      ? "manageModelDescription"
+                      : "manageRecordsDescription",
+                    { model: getModelName(currentModel) }
+                  )}
                   {isSingleton && (
                     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                       {t("singleRecord")}
@@ -633,8 +623,9 @@ export default function AdminDashboard() {
                         {t("loading")}
                       </h3>
                       <p className="text-gray-500">
-                        {t("loading")}{" "}
-                        {getModelName(currentModel).toLowerCase()}...
+                        {t("loadingModel", {
+                          model: getModelName(currentModel),
+                        })}
                       </p>
                     </div>
                   </div>
@@ -674,13 +665,12 @@ export default function AdminDashboard() {
                         )}
                       </CardTitle>
                       <CardDescription className="mt-1">
-                        {isSingleton
-                          ? `${t("manageData")} ${getModelName(
-                            currentModel
-                          ).toLowerCase()} ${t("information")}`
-                          : `${t("manageAllRecords")} ${getModelName(
-                            currentModel
-                          ).toLowerCase()} ${t("records")}`}
+                        {t(
+                          isSingleton
+                            ? "manageModelDescription"
+                            : "manageRecordsDescription",
+                          { model: getModelName(currentModel) }
+                        )}
                       </CardDescription>
                     </div>
 
@@ -695,7 +685,9 @@ export default function AdminDashboard() {
                             <Button className="flex items-center space-x-2 bg-blue-600 hover:bg-[#2A2C38]">
                               <Edit className="h-4 w-4" />
                               <span>
-                                {t("edit")} {getModelName(currentModel)}
+                                {t("editModelTitle", {
+                                  model: getSingularModelName(currentModel),
+                                })}
                               </span>
                             </Button>
                           </DialogTrigger>
@@ -704,7 +696,9 @@ export default function AdminDashboard() {
                               <DialogTitle className="flex items-center space-x-2">
                                 <Edit className="h-5 w-5" />
                                 <span>
-                                  {t("edit")} {getModelName(currentModel)}
+                                  {t("editModelTitle", {
+                                    model: getSingularModelName(currentModel),
+                                  })}
                                 </span>
                               </DialogTitle>
                             </DialogHeader>
@@ -734,9 +728,9 @@ export default function AdminDashboard() {
                               <DialogTitle className="flex items-center space-x-2">
                                 <Plus className="h-5 w-5" />
                                 <span>
-                                  {t("create")}{" "}
-                                  {getModelName(currentModel).slice(0, -1) ||
-                                    t("create")}
+                                  {t("createModelTitle", {
+                                    model: getSingularModelName(currentModel),
+                                  })}
                                 </span>
                               </DialogTitle>
                             </DialogHeader>
@@ -787,8 +781,9 @@ export default function AdminDashboard() {
                     <DialogTitle className="flex items-center space-x-2">
                       <Edit className="h-5 w-5" />
                       <span>
-                        {t("edit")}{" "}
-                        {getModelName(currentModel)?.slice(0, -1) || t("edit")}
+                        {t("editModelTitle", {
+                          model: getSingularModelName(currentModel),
+                        })}
                       </span>
                     </DialogTitle>
                   </DialogHeader>
@@ -1018,7 +1013,7 @@ function SingletonDisplay({
       <div className="text-center py-16">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
         <p className="mt-4 text-gray-500 font-medium">
-          {t("loading")} {getModelName(model).toLowerCase()}...
+          {t("loadingModel", { model: getModelName(model) })}
         </p>
       </div>
     );
@@ -1035,8 +1030,8 @@ function SingletonDisplay({
             {t("noDataAvailable")}
           </h3>
           <p className="mb-6 text-gray-600 max-w-md mx-auto">
-            {getModelName(model)} {t("noDataAvailable").toLowerCase()}.{" "}
-            {t("clickToCreate")}.
+            {t("noDataForModel", { model: getModelName(model) })}{" "}
+            {t("createFirstRecord")}
           </p>
           <Button
             onClick={onEdit}

@@ -33,6 +33,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn, formatPrice, normalizeCurrencyValue } from "@/lib/utils";
+import { getModelLabel } from "@/lib/modelLabels";
 import {
   Edit,
   Trash2,
@@ -154,23 +155,16 @@ export default function DataTable({ model, data, onEdit, loading }) {
 
   // Get model name with translation (uses global language for UI)
   const getModelName = (modelKey) => {
-    const modelNames = {
-      "top-categories": t("topCategories"),
-      categories: t("categories"),
-      products: t("products"),
-      about: t("about"),
-      contacts: t("contacts"),
-      news: t("news"),
-      blogs: t("blogs"),
-      partners: t("partners"),
-      certificates: t("certificates"),
-      licenses: t("licenses"),
-      "vendors-about": t("vendorsAbout"),
-      experiments: t("experiments"),
-      "company-stats": t("companyStats"),
-      discount: t("discount"),
-    };
-    return modelNames[modelKey] || modelConfig?.name || modelKey;
+    return getModelLabel(modelKey, t, {
+      fallback: modelConfig?.name || modelKey,
+    });
+  };
+
+  const getSingularModelName = (modelKey) => {
+    return getModelLabel(modelKey, t, {
+      singular: true,
+      fallback: modelConfig?.name || modelKey,
+    });
   };
 
   // Get available languages for table selector
@@ -416,23 +410,23 @@ export default function DataTable({ model, data, onEdit, loading }) {
       category_id: t("category"),
       top_category_id: t("topCategory"),
       ads_title: t("advertisementTitle"),
-      price: t("price") || "Price($)",
-      price_usd: "Price (USD)",
-      price_uzs: "Price (UZS)",
-      discount: t("discount") || "Discount",
+      price: t("price"),
+      price_usd: t("priceUsd"),
+      price_uzs: t("priceUzs"),
+      discount: t("discount"),
       guarantee: t("guarantee"),
       serial_number: t("serialNumber"),
-      product_id: t("productId") || "Product ID",
+      product_id: t("productId"),
       phone: t("phone"),
-      email: model == "select-reviews" ? "Color key" : t("email"),
-      message:model == "select-reviews" ? "Color" :  t("message"),
+      email: model === "select-reviews" ? t("colorKey") : t("email"),
+      message: model === "select-reviews" ? t("color") : t("message"),
       company_name: t("companyName"),
       phone1: t("phone") + " 1",
       phone2: t("phone") + " 2",
       address: t("address"),
       work_hours: t("workHours"),
-      sum: t("amount") || "Amount",
-      content: t("content") || "Content",
+      sum: t("amount"),
+      content: t("content"),
     };
 
     return (
@@ -475,9 +469,9 @@ export default function DataTable({ model, data, onEdit, loading }) {
           <div className="relative flex-1 min-w-[220px]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder={`${t("search")} ${getModelName(
-                model
-              ).toLowerCase()}...`}
+              placeholder={t("searchModelPlaceholder", {
+                model: getModelName(model),
+              })}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -567,9 +561,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
                   {searchTerm ||
                   (model === "products" && categoryFilter !== "all")
                     ? t("noMatchingRecords")
-                    : `${t("noDataAvailable")} ${getModelName(
-                      model
-                    ).toLowerCase()}`}
+                    : t("noDataForModel", { model: getModelName(model) })}
                 </TableCell>
               </TableRow>
             ) : (
@@ -619,9 +611,9 @@ export default function DataTable({ model, data, onEdit, loading }) {
                               {t("areYouSure")}
                             </AlertDialogTitle>
                             <AlertDialogDescription>
-                              {t("cannotBeUndone")}{" "}
-                              {getModelName(model).toLowerCase().slice(0, -1)}{" "}
-                              {t("removeFromServers")}
+                              {t("deleteModelDescription", {
+                                model: getSingularModelName(model),
+                              })}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>

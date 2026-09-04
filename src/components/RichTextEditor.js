@@ -99,7 +99,7 @@ export function MultilingualRichTextEditor({
   };
 
   const insertLink = () => {
-    const url = prompt('Enter URL:');
+    const url = prompt(t("enterLinkUrl"));
     if (url) {
       executeCommand('createLink', url);
     }
@@ -149,7 +149,7 @@ export function MultilingualRichTextEditor({
           </div>
         </Label>
         <div className="h-32 bg-gray-100 rounded-md animate-pulse flex items-center justify-center">
-          <span className="text-gray-500">Loading editor...</span>
+          <span className="text-gray-500">{t("loadingEditor")}</span>
         </div>
       </div>
     );
@@ -189,13 +189,12 @@ export function MultilingualRichTextEditor({
             className="text-xs border rounded px-2 py-1 bg-white"
             defaultValue=""
           >
-            <option value="">Normal</option>
-            <option value="h1">Heading 1</option>
-            <option value="h2">Heading 2</option>
-            <option value="h3">Heading 3</option>
-            <option value="h4">Heading 4</option>
-            <option value="h5">Heading 5</option>
-            <option value="h6">Heading 6</option>
+            <option value="">{t("normalText")}</option>
+            {[1, 2, 3, 4, 5, 6].map((level) => (
+              <option key={level} value={`h${level}`}>
+                {t("headingLevel", { level })}
+              </option>
+            ))}
           </select>
 
           <div className="border-l mx-1"></div>
@@ -207,7 +206,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('bold')}
-            title="Bold"
+            title={t("bold")}
           >
             <Bold className="h-4 w-4" />
           </Button>
@@ -218,7 +217,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('italic')}
-            title="Italic"
+            title={t("italic")}
           >
             <Italic className="h-4 w-4" />
           </Button>
@@ -229,7 +228,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('underline')}
-            title="Underline"
+            title={t("underline")}
           >
             <Underline className="h-4 w-4" />
           </Button>
@@ -243,7 +242,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('insertUnorderedList')}
-            title="Bullet List"
+            title={t("bulletList")}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -254,7 +253,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('insertOrderedList')}
-            title="Numbered List"
+            title={t("numberedList")}
           >
             <ListOrdered className="h-4 w-4" />
           </Button>
@@ -268,7 +267,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('justifyLeft')}
-            title="Align Left"
+            title={t("alignLeft")}
           >
             <AlignLeft className="h-4 w-4" />
           </Button>
@@ -279,7 +278,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('justifyCenter')}
-            title="Align Center"
+            title={t("alignCenter")}
           >
             <AlignCenter className="h-4 w-4" />
           </Button>
@@ -290,7 +289,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => executeCommand('justifyRight')}
-            title="Align Right"
+            title={t("alignRight")}
           >
             <AlignRight className="h-4 w-4" />
           </Button>
@@ -304,7 +303,7 @@ export function MultilingualRichTextEditor({
             size="sm"
             className="h-8 w-8 p-0"
             onClick={insertLink}
-            title="Insert Link"
+            title={t("insertLink")}
           >
             <Link className="h-4 w-4" />
           </Button>
@@ -340,6 +339,7 @@ export function RichTextDisplay({
   fallbackToFirst = true,
   className = ""
 }) {
+  const { t } = useLanguage();
   const displayValue = MultilingualHelpers.getDisplayValue(value, language);
   
   let content = displayValue;
@@ -350,7 +350,7 @@ export function RichTextDisplay({
   }
 
   if (!content) {
-    return <span className="text-gray-400 italic">No content available</span>;
+    return <span className="text-gray-400 italic">{t("noContentAvailable")}</span>;
   }
 
   return (

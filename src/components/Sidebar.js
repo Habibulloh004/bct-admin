@@ -4,6 +4,7 @@ import { useStore } from '@/lib/store'
 import { MODELS } from '@/lib/models'
 import { useLanguage } from '@/lib/LanguageContext'
 import { cn } from '@/lib/utils'
+import { getModelLabel } from '@/lib/modelLabels'
 import {
   MessageSquare,
   FolderTree,
@@ -95,30 +96,9 @@ export default function Sidebar() {
   }
 
   const getModelName = (modelKey) => {
-    const modelNames = {
-      'top-categories': t('topCategories'),
-      'categories': t('categories'),
-      'products': t('products'),
-      'about': t('about'),
-      'contacts': t('contacts'),
-      'news': t('news'),
-      'blogs': t('blogs'),
-      'partners': t('partners'),
-      'sertificates': t('certificates'),
-      'licenses': t('licenses'),
-      'vendors-about': t('vendorsAbout'),
-      'reviews': t('reviews'),
-      'official-partner': t('officialPartner'),
-      experiments: t('experiments'),
-      'company-stats': t('companyStats'),
-      discount: t('discount'),
-      'select-reviews': t('featuredReviews') || 'Featured Reviews',
-      'admins': t('admins') || 'Administrators',
-      'currencies': t('currencies') || 'Currencies',
-      'banners': t('banners') || 'Banners',
-      'backgrounds': t('backgrounds') || 'Backgrounds'
-    }
-    return modelNames[modelKey] || MODELS[modelKey]?.name || modelKey
+    return getModelLabel(modelKey, t, {
+      fallback: MODELS[modelKey]?.name || modelKey,
+    })
   }
 
   return (
