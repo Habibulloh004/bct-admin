@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { IMG_URL, useStore } from "@/lib/store";
-import { MODELS } from "@/lib/models";
+import { MODELS, MultilingualHelpers } from "@/lib/models";
 import {
   FormLanguageProvider,
   FormLanguageSelector,
@@ -156,12 +156,32 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
       }));
     }
   };
+
+  const hasAllTranslations = (value, richText = false) => {
+    const translations = MultilingualHelpers.parseMultilingual(value);
+    return ["en", "ru", "uz"].every((language) => {
+      let content = translations[language] || "";
+      if (richText) {
+        content = content
+          .replace(/<[^>]*>/g, " ")
+          .replace(/&nbsp;|&#160;/gi, " ");
+      }
+      return content.trim().length > 0;
+    });
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
     modelConfig.fields.forEach((field) => {
       const v = formData[field.key];
-      if (field.required && !v) {
+      if (
+        field.required &&
+        field.requireAllLanguages &&
+        !hasAllTranslations(v, field.type === "multilingual-rich-text")
+      ) {
+        newErrors[field.key] = t("allLanguagesRequired");
+      } else if (field.required && !v) {
         newErrors[field.key] = `${field.label} ${t("required")}`;
       }
       // HEX tekshiruv faqat select-color turlari uchun
@@ -253,6 +273,8 @@ function CreateEditFormContent({ model, item = null, onSuccess, onCancel }) {
   const getFieldLabel = (field) => {
     const fieldLabels = {
       name: t("name"),
+      title: t("title"),
+      text: t("text"),
       image: t("image"),
       description: t("description"),
       ads_title: t("advertisementTitle"),

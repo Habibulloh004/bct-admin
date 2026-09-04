@@ -33,6 +33,7 @@ const API_ROUTE_MAP = {
   'about': 'about',
   'contacts': 'contacts',
   'news': 'news',
+  'blogs': 'blogs',
   'partners': 'partners',
   'sertificates': 'sertificates',
   'licenses': 'licenses',
@@ -52,6 +53,13 @@ const API_ROUTE_MAP = {
   'top-category-sorts': 'top-category-sorts',
   'category-sorts': 'category-sorts'
 };
+
+const getRevalidatePayload = (apiRoute) => ({
+  tag: [apiRoute],
+  ...(apiRoute === 'blogs'
+    ? { paths: ['/blog', '/blog/[id]', '/sitemap.xml'] }
+    : {}),
+});
 
 
 export const useStore = create(
@@ -305,7 +313,7 @@ export const useStore = create(
           });
 
           try {
-            await postApi(API_REVALIDATE, { tag: [`${apiRoute}`] });
+            await postApi(API_REVALIDATE, getRevalidatePayload(apiRoute));
           } catch (revalidateError) {
             console.warn('Revalidate failed:', revalidateError);
           }
@@ -344,7 +352,7 @@ export const useStore = create(
           );
 
           try {
-            await postApi(API_REVALIDATE, { tag: [`${apiRoute}`] });
+            await postApi(API_REVALIDATE, getRevalidatePayload(apiRoute));
           } catch (revalidateError) {
             console.warn('Revalidate failed:', revalidateError);
           }
@@ -382,7 +390,7 @@ export const useStore = create(
           });
 
           try {
-            await postApi(API_REVALIDATE, { tag: [`${apiRoute}`] });
+            await postApi(API_REVALIDATE, getRevalidatePayload(apiRoute));
           } catch (revalidateError) {
             console.warn('Revalidate failed:', revalidateError);
           }

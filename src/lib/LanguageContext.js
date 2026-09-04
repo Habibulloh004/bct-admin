@@ -40,6 +40,7 @@ const translations = {
     about: "About",
     contacts: "Contacts",
     news: "News",
+    blogs: "Blog",
     partners: "Partners",
     certificates: "Projects",
     licenses: "Vendors",
@@ -65,6 +66,8 @@ const translations = {
     // Form Fields
     name: "Name",
     image: "Image",
+    title: "Title",
+    text: "Text",
     description: "Description",
     productName: "Product Name",
     advertisementTitle: "Advertisement Title",
@@ -103,6 +106,7 @@ const translations = {
 
     // Validation
     required: "is required",
+    allLanguagesRequired: "Complete this field in English, Russian and Uzbek",
 
     // Authentication
     adminLogin: "Admin Login",
@@ -237,6 +241,7 @@ const translations = {
     about: "О нас",
     contacts: "Контакты",
     news: "Новости",
+    blogs: "Блог",
     partners: "Наши клиенты",
     certificates: "Проекты",
     licenses: "Вендоры",
@@ -260,6 +265,8 @@ const translations = {
     // Form Fields
     name: "Название",
     image: "Изображение",
+    title: "Заголовок",
+    text: "Текст",
     description: "Описание",
     productName: "Название товара",
     advertisementTitle: "Рекламный заголовок",
@@ -298,6 +305,7 @@ const translations = {
 
     // Validation
     required: "обязательно",
+    allLanguagesRequired: "Заполните это поле на английском, русском и узбекском языках",
 
     // Authentication
     adminLogin: "Вход администратора",
@@ -433,6 +441,7 @@ const translations = {
     about: "Biz haqimizda",
     contacts: "Aloqa",
     news: "Yangiliklar",
+    blogs: "Blog",
     partners: "Hamkorlar",
     certificates: "Loyihalar",
     licenses: "Vendorlar",
@@ -456,6 +465,8 @@ const translations = {
     // Form Fields
     name: "Nomi",
     image: "Rasm",
+    title: "Sarlavha",
+    text: "Matn",
     description: "Tavsif",
     productName: "Mahsulot nomi",
     advertisementTitle: "Reklama sarlavhasi",
@@ -493,6 +504,7 @@ const translations = {
 
     // Validation
     required: "majburiy",
+    allLanguagesRequired: "Bu maydonni ingliz, rus va o‘zbek tillarida to‘ldiring",
 
     // Authentication
     adminLogin: "Administrator kirishi",

@@ -178,6 +178,28 @@ export const MODELS = {
     ],
     displayFields: ["name", "image", "created_at"],
   },
+  blogs: {
+    name: "Blog",
+    icon: "Newspaper",
+    fields: [
+      { key: "image", label: "Cover Image", type: "file", required: true },
+      {
+        key: "title",
+        label: "Title",
+        type: "multilingual",
+        required: true,
+        requireAllLanguages: true,
+      },
+      {
+        key: "text",
+        label: "Text",
+        type: "multilingual-rich-text",
+        required: true,
+        requireAllLanguages: true,
+      },
+    ],
+    displayFields: ["title", "image", "created_at"],
+  },
   partners: {
     name: "Partners",
     icon: "Handshake",

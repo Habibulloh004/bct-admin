@@ -194,6 +194,7 @@ export default function AdminDashboard() {
       about: t("about"),
       contacts: t("contacts"),
       news: t("news"),
+      blogs: t("blogs"),
       partners: t("partners"),
       certificates: t("certificates"),
       licenses: t("licenses"),

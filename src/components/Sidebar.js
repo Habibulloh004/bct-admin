@@ -66,7 +66,7 @@ const menuCategories = [
   },
   {
     titleKey: 'mediaContent',
-    items: ['partners', "licenses","vendors-about", "sertificates"]
+    items: ['blogs', 'partners', "licenses","vendors-about", "sertificates"]
   },
   // {
   //   titleKey: 'reviews',
@@ -102,6 +102,7 @@ export default function Sidebar() {
       'about': t('about'),
       'contacts': t('contacts'),
       'news': t('news'),
+      'blogs': t('blogs'),
       'partners': t('partners'),
       'sertificates': t('certificates'),
       'licenses': t('licenses'),

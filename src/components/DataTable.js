@@ -161,6 +161,7 @@ export default function DataTable({ model, data, onEdit, loading }) {
       about: t("about"),
       contacts: t("contacts"),
       news: t("news"),
+      blogs: t("blogs"),
       partners: t("partners"),
       certificates: t("certificates"),
       licenses: t("licenses"),
@@ -402,6 +403,8 @@ export default function DataTable({ model, data, onEdit, loading }) {
   const getFieldDisplayName = (field) => {
     const fieldNames = {
       name: t("name"),
+      title: t("title"),
+      text: t("text"),
       image: t("image"),
       images: t("image"),
       description: t("description"),
